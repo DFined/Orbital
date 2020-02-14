@@ -1,0 +1,7 @@
+{
+  "mass": 102000000,
+  "radius": 24766000,
+  "texture": "resources/Neptune.jpg",
+  "displayName": "Neptune",
+  "registryName": "neptune"
+}

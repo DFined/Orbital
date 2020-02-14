@@ -1,0 +1,7 @@
+{
+  "mass": 568000000,
+  "radius": 60268000,
+  "texture": "resources/Saturn.jpg",
+  "displayName": "Saturn",
+  "registryName": "saturn"
+}

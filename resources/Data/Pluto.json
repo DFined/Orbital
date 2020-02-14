@@ -1,0 +1,7 @@
+{
+  "mass": 12500,
+  "radius": 1137000,
+  "texture": "resources/Pluto.jpg",
+  "displayName": "Pluto",
+  "registryName": "pluto"
+}

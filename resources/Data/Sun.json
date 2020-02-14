@@ -1,0 +1,7 @@
+{
+  "mass": 1988470000000,
+  "radius": 695700000,
+  "texture": "resources/Sun.jpg",
+  "displayName": "The Sun",
+  "registryName": "sun"
+}

@@ -1,0 +1,7 @@
+{
+  "mass": 4869000,
+  "radius": 6052000,
+  "texture": "resources/Venus.jpg",
+  "displayName": "Venus",
+  "registryName": "venus"
+}

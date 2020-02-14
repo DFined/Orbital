@@ -1,0 +1,7 @@
+{
+  "mass": 5975400,
+  "radius": 6371000,
+  "texture": "resources/Earth.png",
+  "displayName": "The Earth",
+  "registryName": "earth"
+}
