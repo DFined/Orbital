@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class SolarSystemState implements Iterable<BodyState> {
+
+    private transient ArrayList<SolarSystemState> projectedState;
+    private transient ArrayList<SolarSystemState> rejectedState;
+
     private ArrayList<BodyState> bodies = new ArrayList<>();
 
     public boolean add(BodyState state){

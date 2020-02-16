@@ -2,7 +2,6 @@ package DFined.core;
 
 import DFined.Physics.*;
 import DFined.Util;
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
@@ -65,20 +64,20 @@ public class Renderer {
         //render the orbits
         applet.strokeWeight(2/this.scale);
         applet.pushMatrix();
-        applet.translate((float) (-focus.getPosition().getX()), (float) (-focus.getPosition().getY()), (float) (-focus.getPosition().getZ()));
-        //applet.line(0,0,0,200000,0,0);
-        for(BodyState state: system) {
-            if(!state.getBody().isCentral()) {
-                applet.pushMatrix();
-                {
-                    Vector3D center = state.getBody().getOrbit().getAnchor().getPosition();
-                    applet.translate((float) (center.getX()), (float) (center.getY()), (float) (center.getZ()));
-                    applet.rotateX((float) Math.PI / 2);
-          //          body.getOrbit().draw(applet);
-                }
-                applet.popMatrix();
-            }
-        }
+        applet.translate((float) (system.get(0).getX()-focus.getPosition().getX()), (float) (system.get(0).getY()-focus.getPosition().getY()), (float) (system.get(0).getZ()-focus.getPosition().getZ()));
+        applet.line(0,0,0,200000,0,0);
+//        for(BodyState state: system) {
+//            if(!state.getBody().isCentral()) {
+//                applet.pushMatrix();
+//                {
+//                    Vector3D center = state.getBody().getOrbit().getAnchor().getPosition();
+//                    applet.translate((float) (center.getX()), (float) (center.getY()), (float) (center.getZ()));
+//                    applet.rotateX((float) Math.PI / 2);
+//          //          body.getOrbit().draw(applet);
+//                }
+//                applet.popMatrix();
+//            }
+//        }
         applet.popMatrix();
     }
 

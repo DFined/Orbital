@@ -57,7 +57,7 @@ public class Orbital extends PApplet {
         );
 
         system.add(new CelestialBody(BodyPresets.getPreset(BodyPresets.EARTH))
-                .setKinetics(new BodyState(false, 152098233000L, 29291f))
+                .setKinetics(new BodyState(false, 152098233000L, 29292f))
                 .initGraphics(this).getState()
         );
 

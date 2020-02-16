@@ -1,7 +1,9 @@
 package DFined.core;
 
-import java.util.ArrayList;
-
 public class Parameters {
+    private static int timeStep = 1000;
 
+    public static int getTimeStep() {
+        return timeStep;
+    }
 }
