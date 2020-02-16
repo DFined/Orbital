@@ -98,4 +98,8 @@ public class BodyState {
             addAcceleration(accel, other.getBody());
         }
     }
+
+    public void setAcceleration(Vector3D acceleration) {
+        this.acceleration = acceleration;
+    }
 }

@@ -1,5 +1,7 @@
 package DFined.Physics;
 
+import DFined.core.Parameters;
+
 import java.util.List;
 
 public class Physics {
@@ -10,23 +12,20 @@ public class Physics {
     public static final long DISTANCE_SCALE = 1000000;
 
     private static double time = 0;
-    private static long timeSpeed = 365*12;
     private static int physicsTicksPerDraw = 0;
 
-
     public static void tick(double dt, SolarSystemState system){
-        double deltaT = dt*timeSpeed;
+        double deltaT = dt* Parameters.getTimeStep();
         try {
             for(int it = 0; it < Math.max(1,physicsTicksPerDraw); it++) {
                 system.calculateInfluence();
                 if(physicsTicksPerDraw > 0) {
                     system.step(deltaT);
+                    time+=deltaT;
                 }
                 system.clearAcceleration();
-                SolarSystemState stepSystem = system.clone();
-                time+=deltaT;
             }
-        } catch (CloneNotSupportedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         for (BodyState state : system) {
@@ -38,19 +37,15 @@ public class Physics {
         return time;
     }
 
-    public static long getTimeSpeed() {
-        return timeSpeed;
-    }
-
     public static int getPhysicsTicksPerDraw() {
         return physicsTicksPerDraw;
     }
 
     public static void incrementTPD(){
-        physicsTicksPerDraw+=30;
+        physicsTicksPerDraw+=3;
     }
 
     public static void decrementTPD(){
-        physicsTicksPerDraw-=30;
+        physicsTicksPerDraw-=3;
     }
 }
