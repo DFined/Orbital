@@ -13,20 +13,21 @@ public class Physics {
     private static long timeSpeed = 365*12;
     private static int physicsTicksPerDraw = 0;
 
+
     public static void tick(double dt, SolarSystemState system){
-        for(int it = 0; it < Math.max(1,physicsTicksPerDraw); it++) {
-            for (int i = 0; i < system.size() - 1; i++) {
-                system.get(i).getBody().calculateInfluence(system.get().subList(i + 1, system.size()));
-            }
-            if(physicsTicksPerDraw > 0) {
-                for (BodyState state : system) {
-                    state.getBody().tick(dt, timeSpeed);
+        double deltaT = dt*timeSpeed;
+        try {
+            for(int it = 0; it < Math.max(1,physicsTicksPerDraw); it++) {
+                system.calculateInfluence();
+                if(physicsTicksPerDraw > 0) {
+                    system.step(deltaT);
                 }
-                time += dt * timeSpeed;
+                system.clearAcceleration();
+                SolarSystemState stepSystem = system.clone();
+                time+=deltaT;
             }
-            for (BodyState state : system) {
-                state.getBody().postTick();
-            }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
         for (BodyState state : system) {
             state.getBody().update();

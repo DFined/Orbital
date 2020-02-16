@@ -34,20 +34,6 @@ public class CelestialBody {
         return orbit;
     }
 
-    public void calculateInfluence(List<BodyState> others){
-        for(BodyState other: others){
-            Vector3D radius = this.state.getPosition().subtract(other.getPosition());
-            double semiForce = Physics.BIGG/(radius.getNormSq()*Physics.DISTANCE_SCALE);
-            double acc = this.mass*Physics.MASS_UPSCALE*semiForce/(Physics.DISTANCE_SCALE*Physics.DISTANCE_SCALE);
-            Vector3D accel = radius.scalarMultiply(acc/radius.getNorm());
-            other.addAcceleration(accel,this);
-
-            acc = other.getBody().mass*Physics.MASS_UPSCALE*semiForce/(Physics.DISTANCE_SCALE*Physics.DISTANCE_SCALE);
-            accel = radius.scalarMultiply(-acc/radius.getNorm());
-            state.addAcceleration(accel, other.getBody());
-        }
-    }
-
     public void postTick(){
         this.state.clearAcceleration();
     }
@@ -58,9 +44,6 @@ public class CelestialBody {
         }
     }
 
-    public void tick(double deltaT, long timeSpeed){
-        state.tick(deltaT, timeSpeed);
-    }
 
     public void draw(Renderer renderer, PApplet applet){
         applet.pushMatrix();

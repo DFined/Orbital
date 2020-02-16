@@ -2,6 +2,8 @@ package DFined.Physics;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import java.util.List;
+
 public class BodyState {
     private CelestialBody body;
     private boolean central;
@@ -15,6 +17,14 @@ public class BodyState {
         this.position = new Vector3D(apoapsis/Physics.DISTANCE_SCALE,0,0);
         this.velocity = new Vector3D(0,0,minimumV/Physics.DISTANCE_SCALE);
         this.acceleration = new Vector3D(0,0,0);
+    }
+
+    public BodyState(CelestialBody body, boolean central, Vector3D position, Vector3D velocity, Vector3D acceleration) {
+        this.body = body;
+        this.central = central;
+        this.position = position;
+        this.velocity = velocity;
+        this.acceleration = acceleration;
     }
 
     public void addAcceleration(Vector3D accel, CelestialBody source){
@@ -65,8 +75,27 @@ public class BodyState {
          this.acceleration = new Vector3D(0,0,0);
     }
 
-    public void tick(double deltaT, long timeSpeed) {
-        velocity = this.velocity.add(deltaT*timeSpeed,this.acceleration);
-        position = this.position.add(deltaT*timeSpeed,this.velocity);
+    public void tick(double deltaT) {
+        velocity = this.velocity.add(deltaT,this.acceleration);
+        position = this.position.add(deltaT,this.velocity);
+    }
+
+    @Override
+    public BodyState clone() throws CloneNotSupportedException {
+        return new BodyState(body, central, position.scalarMultiply(1),velocity.scalarMultiply(1),acceleration.scalarMultiply(1));
+    }
+
+    public void calculateInfluence(List<BodyState> others){
+        for(BodyState other: others){
+            Vector3D radius = position.subtract(other.position);
+            double semiForce = Physics.BIGG/(radius.getNormSq()*Physics.DISTANCE_SCALE);
+            double acc = this.body.getMass()*Physics.MASS_UPSCALE*semiForce/(Physics.DISTANCE_SCALE*Physics.DISTANCE_SCALE);
+            Vector3D accel = radius.scalarMultiply(acc/radius.getNorm());
+            other.addAcceleration(accel,this.getBody());
+
+            acc = other.body.getMass()*Physics.MASS_UPSCALE*semiForce/(Physics.DISTANCE_SCALE*Physics.DISTANCE_SCALE);
+            accel = radius.scalarMultiply(-acc/radius.getNorm());
+            addAcceleration(accel, other.getBody());
+        }
     }
 }

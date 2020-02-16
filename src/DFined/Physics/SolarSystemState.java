@@ -41,4 +41,31 @@ public class SolarSystemState implements Iterable<BodyState> {
     public List<BodyState> get() {
         return bodies;
     }
+
+    @Override
+    public SolarSystemState clone() throws CloneNotSupportedException {
+        SolarSystemState newState = new SolarSystemState();
+        for(BodyState state: this){
+            newState.add(state.clone());
+        }
+        return newState;
+    }
+
+    public void calculateInfluence(){
+        for (int i = 0; i < this.size() - 1; i++) {
+            this.get(i).calculateInfluence(this.get().subList(i + 1, this.size()));
+        }
+    }
+
+    public void step(double dt) {
+        for (BodyState state : this) {
+            state.tick(dt);
+        }
+    }
+
+    public void clearAcceleration() {
+        for(BodyState state: this){
+            state.clearAcceleration();
+        }
+    }
 }
