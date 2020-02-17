@@ -90,7 +90,10 @@ public class Orbital extends PApplet {
                 .setKinetics(new BodyState(	false, -7375930000000d,-3710f))
                 .initGraphics(this).getState()
         );
-
+        system.add(new CelestialBody(BodyPresets.getPreset(BodyPresets.SUN))
+                .setKinetics(new BodyState(true, -722300000000d, 5000))
+                .initGraphics(this).getState()
+        );
 
         renderer.setFocus(system.get(0).getBody());
     }

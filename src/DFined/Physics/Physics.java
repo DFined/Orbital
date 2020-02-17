@@ -28,6 +28,7 @@ public class Physics {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        system.project(deltaT*Parameters.PROJECTION_MULTIPLIER);
         for (BodyState state : system) {
             state.getBody().update();
         }
@@ -42,10 +43,10 @@ public class Physics {
     }
 
     public static void incrementTPD(){
-        physicsTicksPerDraw+=3;
+        physicsTicksPerDraw+=20;
     }
 
     public static void decrementTPD(){
-        physicsTicksPerDraw-=3;
+        physicsTicksPerDraw-=20;
     }
 }

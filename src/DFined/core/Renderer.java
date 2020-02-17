@@ -37,7 +37,7 @@ public class Renderer {
         applet.text(scale,20,100);
         applet.text(Util.formatSeconds(Math.round(Physics.getTime())),20,150);
         applet.text(Physics.getPhysicsTicksPerDraw(),20,200);
-        if(focus != system.get(0).getBody()) {
+        if(!focus.isCentral()) {
             applet.text(focus.getOrbit().toString(), 20, 250);
         }
 
@@ -61,11 +61,12 @@ public class Renderer {
             applet.popMatrix();
         }
 
-        //render the orbits
-        applet.strokeWeight(2/this.scale);
+        //render the trajectories
+        applet.strokeWeight(1/this.scale);
         applet.pushMatrix();
         applet.translate((float) (system.get(0).getX()-focus.getPosition().getX()), (float) (system.get(0).getY()-focus.getPosition().getY()), (float) (system.get(0).getZ()-focus.getPosition().getZ()));
         applet.line(0,0,0,200000,0,0);
+//        system.drawProjection(applet);
 //        for(BodyState state: system) {
 //            if(!state.getBody().isCentral()) {
 //                applet.pushMatrix();
