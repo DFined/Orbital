@@ -1,0 +1,7 @@
+{
+  "mass": 108,
+  "radius": 252000,
+  "texture": "resources/Enceladus.jpg",
+  "displayName": "Enceladus",
+  "registryName": "enceladus"
+}

@@ -1,0 +1,7 @@
+{
+  "mass": 73460,
+  "radius": 1738000,
+  "texture": "resources/Moon.jpg",
+  "displayName": "The Moon",
+  "registryName": "moon"
+}

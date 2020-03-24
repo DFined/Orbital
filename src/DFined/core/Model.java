@@ -7,9 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import processing.core.PApplet;
-import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import sun.plugin2.message.PrintAppletReplyMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +41,7 @@ public class Model extends PApplet {
         Collection<File> resources = FileUtils.listFiles(data, FileFilterUtils.trueFileFilter(), FileFilterUtils.trueFileFilter());
         for (File file : resources) {
             try {
-                BodyPresets.addPreset(FileUtils.readFileToString(file, "utf8"));
+                BodyParameters.addPreset(FileUtils.readFileToString(file, "utf8"));
             } catch (IOException e) {
                 logger.log(Level.WARNING, String.format("Error loading resource \'%s\'", file.getName()), e);
             }
@@ -57,49 +55,49 @@ public class Model extends PApplet {
 
         stroke(255);
 
-        this.addBody(BodyPresets.SUN, 0, 0, true, false);
+        this.addBody(BodyParameters.SUN, 0, 0, true, false);
 
-        this.addBody(BodyPresets.MERCURY, 69816900000L, 38860f, false, false);
+        this.addBody(BodyParameters.MERCURY, 69816900000L, 38860f, false, false);
 
-        this.addBody(BodyPresets.VENUS, -108940000000L, -(34780f), false, false);
+        this.addBody(BodyParameters.VENUS, -108940000000L, -(34780f), false, false);
 
-        BodyState earth = this.addBody(BodyPresets.EARTH, 152098233000L, 29292f, false, false);
+        CelestialBody earth = this.addBody(BodyParameters.EARTH, 152098233000L, 29292f, false, false);
 
-        this.attachBody(BodyPresets.MOON, -405500000L, 970f, earth, true);
+        this.attachBody(BodyParameters.MOON, -405500000L, 970f, earth, true);
 
-        BodyState mars = this.addBody(BodyPresets.MARS, -249200000000L, -22000f, false, false);
+        CelestialBody mars = this.addBody(BodyParameters.MARS, -249200000000L, -22000f, false, false);
 
-        this.attachBody(BodyPresets.PHOBOS, -9517000L, 2138f, mars, true);
+        this.attachBody(BodyParameters.PHOBOS, -9517000L, 2138f, mars, true);
 
-        this.attachBody(BodyPresets.DEIMOS, -23470000L, 1351f, mars, true);
+        this.attachBody(BodyParameters.DEIMOS, -23470000L, 1351f, mars, true);
 
-        BodyState jupiter = this.addBody(BodyPresets.JUPITER, 816620000000L, 12440f, false, false);
+        CelestialBody jupiter = this.addBody(BodyParameters.JUPITER, 816620000000L, 12440f, false, false);
 
-        this.attachBody(BodyPresets.EUROPA, 676938000L, 13740f, jupiter, true);
+        this.attachBody(BodyParameters.EUROPA, 676938000L, 13740f, jupiter, true);
 
-        this.attachBody(BodyPresets.GANYMEDE, -1071600000L, 10880f, jupiter, true);
+        this.attachBody(BodyParameters.GANYMEDE, -1071600000L, 10880f, jupiter, true);
 
-        this.attachBody(BodyPresets.IO, -423400000L, 17334f, jupiter, true);
+        this.attachBody(BodyParameters.IO, -423400000L, 17334f, jupiter, true);
 
-        this.attachBody(BodyPresets.CALLISTO, 1897000000L, 8204f, jupiter, true);
+        this.attachBody(BodyParameters.CALLISTO, 1897000000L, 8204f, jupiter, true);
 
-        BodyState saturn = this.addBody(BodyPresets.SATURN, -1514500000000L, -9090f, false, false);
+        CelestialBody saturn = this.addBody(BodyParameters.SATURN, -1514500000000L, -9090f, false, false);
 
-        this.attachBody(BodyPresets.TITAN, 1257060000L, 5570f, saturn, true);
+        this.attachBody(BodyParameters.TITAN, 1257060000L, 5570f, saturn, true);
 
-        this.attachBody(BodyPresets.ENCELADUS, -239156000L, 12635f, saturn, true);
+        this.attachBody(BodyParameters.ENCELADUS, -239156000L, 12635f, saturn, true);
 
-        this.attachBody(BodyPresets.MIMAS, 189176000L, 14280f, saturn, true);
+        this.attachBody(BodyParameters.MIMAS, 189176000L, 14280f, saturn, true);
 
-        this.addBody(BodyPresets.URANUS, 3003620000000L, 6490f, false, false);
+        this.addBody(BodyParameters.URANUS, 3003620000000L, 6490f, false, false);
 
-        this.addBody(BodyPresets.NEPTUNE, -4545670000000L, -5370f, false, false);
+        this.addBody(BodyParameters.NEPTUNE, -4545670000000L, -5370f, false, false);
 
-        this.addBody(BodyPresets.PLUTO, -7375930000000L, -3710f, false, false);
+        this.addBody(BodyParameters.PLUTO, -7375930000000L, -3710f, false, false);
 
         gui = new GUI(this);
 
-        renderer.setFocus(system.get(0).getBody());
+        renderer.setFocus(system.get(0));
     }
 
     public static Renderer getRenderer() {
@@ -140,23 +138,21 @@ public class Model extends PApplet {
 
     private static int focus = 0;
 
-    private BodyState addBody(String registryName, long apoapsis, float apoV, boolean central, boolean light) {
-        BodyState state = new BodyState(central, apoapsis, apoV);
-        return system.add(new CelestialBody(BodyPresets.getPreset(registryName))
-                .setKinetics(state)
-                .initGraphics(this).getState()
+    private CelestialBody addBody(String registryName, long apoapsis, float apoV, boolean central, boolean light) {
+        return system.add(new CelestialBody(BodyParameters.getPreset(registryName))
+                .setKinetics(central, apoapsis, apoV)
+                .initGraphics(this)
         );
     }
 
-    private void attachBody(String registryName, long apoapsis, float apoV, BodyState center, boolean light) {
-        BodyState state = new BodyState(
-                false,
-                center.getBody().getPosition().getX() * Physics.DISTANCE_SCALE + apoapsis,
-                center.getBody().getVelocity().getZ() * Physics.DISTANCE_SCALE + apoV
-        );
-        system.add(new CelestialBody(BodyPresets.getPreset(registryName))
-                .setKinetics(state)
-                .initGraphics(this).getState()
+    private void attachBody(String registryName, long apoapsis, float apoV, CelestialBody center, boolean light) {
+        system.add(new CelestialBody(BodyParameters.getPreset(registryName))
+                .setKinetics(
+                        false,
+                        center.getPosition().getX() * Physics.DISTANCE_SCALE + apoapsis,
+                        center.getVelocity().getZ() * Physics.DISTANCE_SCALE + apoV
+                )
+                .initGraphics(this)
         );
     }
 

@@ -1,17 +1,14 @@
 package DFined.core;
 
-import DFined.Physics.BodyState;
 import DFined.Physics.CelestialBody;
 import DFined.Physics.Physics;
 import DFined.Physics.SolarSystemState;
 import DFined.Util;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PShape;
-import processing.event.MouseEvent;
 
 public class Renderer {
     private float scale = 0.1f;
@@ -76,11 +73,11 @@ public class Renderer {
         graphics.noFill();
 
         //Render the planets
-        for (BodyState state : system) {
+        for (CelestialBody state : system) {
             graphics.pushMatrix();
             {
                 graphics.translate((float) (state.getX() - focus.getPosition().getX()), (float) (state.getY() - focus.getPosition().getY()), (float) (state.getZ() - focus.getPosition().getZ()));
-                state.getBody().draw(this, graphics);
+                state.draw(this, graphics);
             }
             graphics.popMatrix();
         }

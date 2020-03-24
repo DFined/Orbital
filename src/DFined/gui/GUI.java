@@ -1,11 +1,9 @@
 package DFined.gui;
 
-import DFined.Physics.BodyState;
 import DFined.Physics.CelestialBody;
 import DFined.Physics.Physics;
 import DFined.Physics.SolarSystemState;
 import DFined.core.Model;
-import DFined.core.Parameters;
 import g4p_controls.*;
 import processing.core.PApplet;
 
@@ -76,16 +74,16 @@ public class GUI {
         }
     }
 
-    public Iterator<BodyState> updatePlanets(SolarSystemState system, String filter) {
+    public Iterator<CelestialBody> updatePlanets(SolarSystemState system, String filter) {
         if (!filter.isEmpty()) {
             return system.get().stream().filter(
-                    state -> state.getBody().getName().toLowerCase().contains(filter.toLowerCase())
+                    state -> state.getName().toLowerCase().contains(filter.toLowerCase())
             ).iterator();
         }
         return system.iterator();
     }
 
-    public void addPlanetsToLeft(GPanel panel, PApplet applet, Iterator<BodyState> planets) {
+    public void addPlanetsToLeft(GPanel panel, PApplet applet, Iterator<CelestialBody> planets) {
         int i = 0;
         for (; planets.hasNext(); i++) {
             int startY = TEXT_SIZE + PADDING + (TEXT_SIZE / 3 + PADDING) * i;
@@ -95,7 +93,7 @@ public class GUI {
                     startY,
                     panel.getWidth() - PADDING * 2,
                     startY + TEXT_SIZE / 3,
-                    planets.next().getBody().getName()
+                    planets.next().getName()
             );
             planet.setFont(DEFAULT_FONT);
             planet.addEventHandler(this, "planetPressed");
@@ -198,8 +196,8 @@ public class GUI {
         if (event == GEvent.CLICKED || event == GEvent.PRESSED) {
             Model.getRenderer().setFocus(
                     Model.getSystem().get().parallelStream().filter(
-                            state -> state.getBody().getName().equals(button.getText())
-                    ).findFirst().get().getBody()
+                            state -> state.getName().equals(button.getText())
+                    ).findFirst().get()
             );
         }
     }

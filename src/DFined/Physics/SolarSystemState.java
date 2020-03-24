@@ -9,35 +9,35 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-public class SolarSystemState implements Iterable<BodyState> {
+public class SolarSystemState implements Iterable<CelestialBody> {
 
-    private ArrayList<BodyState> toAdd = new ArrayList<>();
-    private ArrayList<BodyState> toRemove = new ArrayList<>();
+    private ArrayList<CelestialBody> toAdd = new ArrayList<>();
+    private ArrayList<CelestialBody> toRemove = new ArrayList<>();
 
-    private ArrayList<BodyState> bodies = new ArrayList<>();
+    private ArrayList<CelestialBody> bodies = new ArrayList<>();
 
-    public BodyState add(BodyState state) {
+    public CelestialBody add(CelestialBody state) {
         bodies.add(state);
         return state;
     }
 
-    public BodyState get(int num) {
+    public CelestialBody get(int num) {
         return bodies.get(num);
     }
 
 
     @Override
-    public Iterator<BodyState> iterator() {
+    public Iterator<CelestialBody> iterator() {
         return bodies.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super BodyState> action) {
+    public void forEach(Consumer<? super CelestialBody> action) {
         bodies.forEach(action);
     }
 
     @Override
-    public Spliterator<BodyState> spliterator() {
+    public Spliterator<CelestialBody> spliterator() {
         return bodies.spliterator();
     }
 
@@ -45,7 +45,7 @@ public class SolarSystemState implements Iterable<BodyState> {
         return bodies.size();
     }
 
-    public List<BodyState> get() {
+    public List<CelestialBody> get() {
         return bodies;
     }
 
@@ -61,35 +61,35 @@ public class SolarSystemState implements Iterable<BodyState> {
             toRemove.clear();
             Model.getGui().reconstructMainPanel();
         }
-        for (BodyState state : this) {
+        for (CelestialBody state : this) {
             state.tick(dt);
         }
     }
 
     public void clearAcceleration() {
-        for (BodyState state : this) {
+        for (CelestialBody state : this) {
             state.clearAcceleration();
         }
     }
 
-    public void collide(BodyState bodyState, BodyState other) {
-        BodyState larger = bodyState;
-        BodyState smaller = other;
-        if (other.getBody().getMass() > larger.getBody().getMass()) {
+    public void collide(CelestialBody CelestialBody, CelestialBody other) {
+        CelestialBody larger = CelestialBody;
+        CelestialBody smaller = other;
+        if (other.getMass() > larger.getMass()) {
             larger = other;
-            smaller = bodyState;
+            smaller = CelestialBody;
         }
-        larger.getBody().setMass(larger.getBody().getMass() + smaller.getBody().getMass());
-        larger.getBody().setRadius(
-                Math.cbrt(Math.pow(larger.getBody().getRadius(), 3) + Math.pow(smaller.getBody().getRadius(), 3))
+        larger.setMass(larger.getMass() + smaller.getMass());
+        larger.setRadius(
+                Math.cbrt(Math.pow(larger.getRadius(), 3) + Math.pow(smaller.getRadius(), 3))
         );
         larger.setVelocity(
                 larger.getVelocity()
-                        .scalarMultiply(larger.getBody().getMass() / 2)
-                        .add(smaller.getBody().getMass() / 2, smaller.getVelocity())
-                        .scalarMultiply(1/(larger.getBody().getMass() + smaller.getBody().getMass()))
+                        .scalarMultiply(larger.getMass() / 2)
+                        .add(smaller.getMass() / 2, smaller.getVelocity())
+                        .scalarMultiply(1/(larger.getMass() + smaller.getMass()))
         );
-        larger.getBody().initGraphics(larger.getBody().getApplet());
+        larger.initGraphics(larger.getApplet());
         this.toRemove.add(smaller);
     }
 }

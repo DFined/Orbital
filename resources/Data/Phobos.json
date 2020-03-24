@@ -1,0 +1,7 @@
+{
+  "mass": 0.016,
+  "radius": 11200,
+  "texture": "resources/Phobos.jpg",
+  "displayName": "Phobos",
+  "registryName": "phobos"
+}

@@ -1,0 +1,7 @@
+{
+  "mass": 0.00147,
+  "radius": 6200,
+  "texture": "resources/Deimos.jpg",
+  "displayName": "Deimos",
+  "registryName": "deimos"
+}

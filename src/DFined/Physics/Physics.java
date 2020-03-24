@@ -29,8 +29,8 @@ public class Physics {
             e.printStackTrace();
         }
 
-        for (BodyState state : system) {
-            state.getBody().update();
+        for (CelestialBody state : system) {
+            state.update();
         }
     }
 
