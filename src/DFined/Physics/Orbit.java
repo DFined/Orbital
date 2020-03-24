@@ -1,8 +1,6 @@
 package DFined.Physics;
 
 import DFined.Util;
-import DFined.core.Orbital;
-import DFined.core.Renderer;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import processing.core.PApplet;
 
@@ -57,28 +55,30 @@ public class Orbit {
 
             v = ((2u/(v1 * r1* sin(a1))) +- sqrt(4u^2/(v1 * r1* sin(a1))^2 - 8u/r1 + 4*v1^2))/2
         */
-        double sa = rVel.normalize().crossProduct(radius).getNorm();
-        double d = v*r*sa;
-        double vc = (orbitalParameter/d);
-        double vv = Math.sqrt(4*Math.pow(orbitalParameter/d,2) - 8*orbitalParameter/r + 4*v*v)/2;
+        if(rVel.getNorm() > 0) {
+            double sa = rVel.normalize().crossProduct(radius).getNorm();
+            double d = v * r * sa;
+            double vc = (orbitalParameter / d);
+            double vv = Math.sqrt(4 * Math.pow(orbitalParameter / d, 2) - 8 * orbitalParameter / r + 4 * v * v) / 2;
 
-        this.apoV = vc-vv;
-        this.periV = vc+vv;
-        this.periapsis = d/this.periV;
-        this.apoapsis = d/this.apoV;
-        this.period = (long)Math.sqrt( Math.pow(semiMajor,3)*4*Math.pow(Math.PI,2)/(orbitalParameter));
-        this.eccentricity = apoapsis/semiMajor-1;
-        this.semiMinor = semiMajor * Math.sqrt(1-Math.pow(eccentricity,2));
-        this.focus = Math.sqrt(Math.pow(this.semiMajor,2) - Math.pow(this.semiMinor,2));
-        this.phase = Math.acos((d*d/orbitalParameter-r)/(this.eccentricity*r));
-        if(rVel.dotProduct(radius) > 0){
-            this.phase = 2*Math.PI-this.phase;
+            this.apoV = vc - vv;
+            this.periV = vc + vv;
+            this.periapsis = d / this.periV;
+            this.apoapsis = d / this.apoV;
+            this.period = (long) Math.sqrt(Math.pow(semiMajor, 3) * 4 * Math.pow(Math.PI, 2) / (orbitalParameter));
+            this.eccentricity = apoapsis / semiMajor - 1;
+            this.semiMinor = semiMajor * Math.sqrt(1 - Math.pow(eccentricity, 2));
+            this.focus = Math.sqrt(Math.pow(this.semiMajor, 2) - Math.pow(this.semiMinor, 2));
+            this.phase = Math.acos((d * d / orbitalParameter - r) / (this.eccentricity * r));
+            if (rVel.dotProduct(radius) > 0) {
+                this.phase = 2 * Math.PI - this.phase;
+            }
+            double o2h = Math.acos(radius.dotProduct(new Vector3D(-1, 0, 0)));
+            if (radius.dotProduct(new Vector3D(0, 0, 1)) > 0) {
+                o2h = 2 * Math.PI - o2h;
+            }
+            this.yawOffset = this.phase - o2h;
         }
-        double o2h = Math.acos(radius.dotProduct(new Vector3D(-1,0,0)));
-        if(radius.dotProduct(new Vector3D(0,0,1)) > 0){
-            o2h = 2*Math.PI-o2h;
-        }
-        this.yawOffset = this.phase-o2h;
     }
 
     public double twoPiAngle(double asin, double acos){

@@ -1,5 +1,7 @@
 package DFined.Physics;
 
+import DFined.core.Parameters;
+
 import java.util.List;
 
 public class Physics {
@@ -10,24 +12,23 @@ public class Physics {
     public static final long DISTANCE_SCALE = 1000000;
 
     private static double time = 0;
-    private static long timeSpeed = 365*12;
     private static int physicsTicksPerDraw = 0;
 
     public static void tick(double dt, SolarSystemState system){
-        for(int it = 0; it < Math.max(1,physicsTicksPerDraw); it++) {
-            for (int i = 0; i < system.size() - 1; i++) {
-                system.get(i).getBody().calculateInfluence(system.get().subList(i + 1, system.size()));
-            }
-            if(physicsTicksPerDraw > 0) {
-                for (BodyState state : system) {
-                    state.getBody().tick(dt, timeSpeed);
+        double deltaT = dt* Parameters.getTimeStep();
+        try {
+            for(int it = 0; it < Math.max(1,physicsTicksPerDraw); it++) {
+                system.calculateInfluence();
+                if(physicsTicksPerDraw > 0) {
+                    system.step(deltaT);
+                    time+=deltaT;
                 }
-                time += dt * timeSpeed;
+                system.clearAcceleration();
             }
-            for (BodyState state : system) {
-                state.getBody().postTick();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         for (BodyState state : system) {
             state.getBody().update();
         }
@@ -37,19 +38,11 @@ public class Physics {
         return time;
     }
 
-    public static long getTimeSpeed() {
-        return timeSpeed;
-    }
-
     public static int getPhysicsTicksPerDraw() {
         return physicsTicksPerDraw;
     }
 
-    public static void incrementTPD(){
-        physicsTicksPerDraw+=30;
-    }
-
-    public static void decrementTPD(){
-        physicsTicksPerDraw-=30;
+    public static void setPhysicsTicksPerDraw(int physicsTicksPerDraw) {
+        Physics.physicsTicksPerDraw = physicsTicksPerDraw;
     }
 }

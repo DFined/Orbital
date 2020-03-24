@@ -3,12 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="5b3b3aef-7c0f-48d0-ac87-d1feb018206b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Orbital/DFined/core/Orbital.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Orbital/DFined/core/Orbital.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Orbital/DFined/core/Renderer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Orbital/DFined/core/Renderer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DFined/Physics/SolarSystemState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DFined/Physics/SolarSystemState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DFined/core/Orbital.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DFined/core/Orbital.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Orbital/DFined/Physics/BodyState.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Orbital/DFined/Physics/BodyState.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Orbital/DFined/Physics/Physics.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Orbital/DFined/Physics/Physics.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Orbital/DFined/core/Parameters.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Orbital/DFined/core/Parameters.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DFined/Physics/BodyState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DFined/Physics/BodyState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DFined/Physics/Physics.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DFined/Physics/Physics.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/DFined/core/Parameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DFined/core/Parameters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DFined/core/Renderer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DFined/core/Renderer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,9 +23,22 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="BetterPhysics" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="3f2984e1c36a47039b9b63c28e8c7801db4c7f0c" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -77,6 +90,7 @@
         <item itemvalue="Application.Orbital" />
         <item itemvalue="Application.Orbital" />
         <item itemvalue="Application.Orbital" />
+        <item itemvalue="Application.Orbital" />
       </list>
     </recent_temporary>
   </component>
@@ -110,26 +124,42 @@
       <option name="project" value="LOCAL" />
       <updated>1581706442922</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added Parameters, removing orbit rendering.">
+      <created>1581847812924</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1581847812925</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Refactoring physics.">
+      <created>1581857449895</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1581857449895</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="Added Parameters, removing orbit rendering." />
+    <MESSAGE value="Refactoring physics." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring physics." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1581713547163">
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1581848297011">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1581713547163" />
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1581848297011" />
     <state x="462" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1581106599137">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="462" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581106599137" />
-    <state x="626" y="119" key="CommitChangelistDialog2" timestamp="1581847774984">
+    <state x="626" y="119" key="CommitChangelistDialog2" timestamp="1581857449057">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="626" y="119" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1581847774984" />
+    <state x="626" y="119" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1581857449057" />
     <state x="714" y="239" key="DetectedRootsChooserDialog" timestamp="1581020319951">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -138,38 +168,38 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="666" y="265" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1581705934398" />
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1581845160211">
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1581866590603">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581845160211" />
-    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1581845160211">
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581866590603" />
+    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1581866590603">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581845160211" />
-    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1581845160211">
+    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581866590603" />
+    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1581866590603">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581845160211" />
-    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1581845160211">
+    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581866590603" />
+    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1581866590603">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581845160211" />
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1581272668527">
+    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581866590603" />
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1581858268970">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581272668527" />
-    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1581272668527">
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581858268970" />
+    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1581858268970">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581272668527" />
-    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1581272668526">
+    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581858268970" />
+    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1581858268970">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581272668526" />
-    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1581272668527">
+    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581858268970" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1581858268970">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581272668527" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581858268970" />
     <state x="772" y="234" key="RollbackChangesDialog" timestamp="1581714544413">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -178,10 +208,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="440" y="99" width="1040" height="843" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1581106275391" />
-    <state x="552" y="256" key="Vcs.Push.Dialog.v2" timestamp="1581706491929">
+    <state x="552" y="256" key="Vcs.Push.Dialog.v2" timestamp="1581857459794">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1581706491929" />
+    <state x="552" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1581857459794" />
     <state x="0" y="0" key="com.intellij.ide.util.TipDialog" timestamp="1581842705453">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -198,24 +228,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="668" y="155" key="refactoring.ChangeSignatureDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581264980599" />
-    <state x="616" y="240" key="run.anything.popup" timestamp="1581712367205">
+    <state x="616" y="240" key="run.anything.popup" timestamp="1581848870587">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1581712367205" />
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1581848870587" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1581712299395">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1581712299395" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/DFined/Physics/Orbit.java</url>
-          <line>80</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="system" />
+        <watch expression="system" language="JAVA" />
+        <watch expression="deltaT" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
