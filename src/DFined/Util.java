@@ -17,4 +17,8 @@ public class Util {
     public static double constrain(double low, double high, double value) {
         return Math.max(Math.min(value, high), low);
     }
+
+    public static int constrain(int low, int high, int value) {
+        return Math.max(Math.min(value, high), low);
+    }
 }

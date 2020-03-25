@@ -39,6 +39,13 @@ public class ViewHandler extends GViewListener {
     }
 
     @Override
+    public void mouseMoved() {
+        if(Model.getGui().copy != null){
+
+        }
+    }
+
+    @Override
     public void mouseEntered() {
         getPApplet().noCursor();
         Model.getRenderer().mousePressed(mouseX(), mouseY());

@@ -47,8 +47,7 @@ public class Renderer {
 
         graphics.text(applet.frameRate, 20, 50);
         graphics.text(scale, 20, 100);
-        graphics.text(Util.formatSeconds(Math.round(Physics.getTime())), 20, 150);
-        graphics.text(Physics.getPhysicsTicksPerDraw(), 20, 200);
+        graphics.text(Physics.getTimeSpeed(), 20, 200);
         if (!focus.isCentral()) {
             graphics.text(focus.getOrbit().toString(), 20, 250);
         }

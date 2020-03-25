@@ -3,7 +3,9 @@ package DFined.gui;
 import DFined.Physics.CelestialBody;
 import DFined.Physics.Physics;
 import DFined.Physics.SolarSystemState;
+import DFined.Util;
 import DFined.core.Model;
+import DFined.core.Parameters;
 import g4p_controls.*;
 import processing.core.PApplet;
 
@@ -22,13 +24,21 @@ public class GUI {
     private static final int RIGHT_PANEL_SIZE = 300;
     public static final int TEXT_SIZE = 100;
     public static final int PADDING = 15;
-    private static final int BOTTOM_PANEL_SIZE = PADDING * 3;
+    private static final int BOTTOM_PANEL_SIZE = PADDING * 6;
     private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 22);
+    private static final Font SMALLER_FONT = new Font("Monospaced", Font.PLAIN, 16);
     private static GTextField NAME;
     private static GTextField MASS;
     private static GTextField RADIUS;
     private static GTextField SEARCH;
-    private static GTextField TPSDISPLAY;
+    private static GTextField TIME_SPEED;
+    private static GTextField CURRENT_TIME;
+    private static GTextField PASTE_LABEL;
+
+
+    public void update() {
+        CURRENT_TIME.setText(Util.formatSeconds(Math.round(Physics.getTime())));
+    }
 
     public GUI(PApplet applet) {
         G4P.setCtrlMode(GControlMode.CORNERS);
@@ -56,21 +66,78 @@ public class GUI {
                 applet.width - RIGHT_PANEL_SIZE,
                 applet.height
         );
-        GTextField tpsDisplay = new GTextField(applet, PADDING, PADDING / 2, PADDING * 8, PADDING * 5 / 2);
-        tpsDisplay.addEventHandler(this, "timeSpeedChanged");
-        tpsDisplay.setFont(DEFAULT_FONT);
-        panel.addControl(tpsDisplay);
+
+        GLabel tpsLabel = new GLabel(
+                applet,
+                PADDING,
+                PADDING / 2,
+                PADDING * 16,
+                PADDING * 5 / 2
+        );
+
+        TIME_SPEED = new GTextField(
+                applet,
+                PADDING * 17,
+                PADDING / 2,
+                PADDING * 25,
+                PADDING * 5 / 2
+        );
+        GButton apply = new GButton(
+                applet,
+                PADDING * 26,
+                PADDING / 2,
+                PADDING * 30,
+                PADDING * 5 / 2,
+                "Apply"
+        );
+        apply.addEventHandler(this, "timeSpeedChanged");
+        tpsLabel.setText("Time speed multiplier");
+        tpsLabel.setFont(SMALLER_FONT);
+        TIME_SPEED.setFont(DEFAULT_FONT);
+        panel.addControl(TIME_SPEED);
+        panel.addControl(tpsLabel);
+        panel.addControl(apply);
+        GLabel ctLabel = new GLabel(
+                applet,
+                PADDING,
+                PADDING * 7 / 2,
+                PADDING * 140,
+                PADDING * 11 / 2,
+                "Current time"
+        );
+
+        ctLabel.setFont(SMALLER_FONT);
+
+        CURRENT_TIME = new GTextField(
+                applet,
+                PADDING * 10,
+                PADDING * 7 / 2,
+                PADDING * 33,
+                PADDING * 11 / 2
+        );
+        CURRENT_TIME.setFont(SMALLER_FONT);
+        CURRENT_TIME.setTextEditEnabled(false);
+        panel.addControl(CURRENT_TIME);
+        panel.addControl(ctLabel);
         panel.setOpaque(false);
         return panel;
     }
 
-    public void timeSpeedChanged(GTextField field, GEvent event) {
-        if (event == GEvent.CHANGED) {
+    public void timeSpeedChanged(GButton button, GEvent event) {
+        if (event == GEvent.CLICKED) {
             int tpd = 0;
-            if (!field.getText().trim().isEmpty()) {
-                tpd = Integer.parseInt(field.getText());
+            if (!TIME_SPEED.getText().trim().isEmpty()) {
+                try {
+                    tpd = DFined.Util.constrain(
+                            0,
+                            Parameters.MAX_TIME_SPEED,
+                            Integer.parseInt(TIME_SPEED.getText())
+                    );
+                } catch (NumberFormatException e) {
+                }
             }
-            Physics.setPhysicsTicksPerDraw(tpd);
+            TIME_SPEED.setText(Integer.toString(tpd));
+            Physics.setTimeSpeed(tpd);
         }
     }
 
@@ -103,6 +170,7 @@ public class GUI {
 
     public GPanel constructInfoPanel(PApplet applet) {
         GPanel panel = new GPanel(applet, applet.width - RIGHT_PANEL_SIZE, 0, applet.width, applet.height, "");
+        panel.setDraggable(false);
         NAME = new GTextField(
                 applet,
                 PADDING,
@@ -164,10 +232,18 @@ public class GUI {
                 "Copy selected body"
         );
         copy.addEventHandler(this, "copyBodyEvent");
-
+        vS += TEXT_SIZE / 3 + PADDING;
+        GLabel pasteLabel = new GLabel(
+                applet,
+                PADDING * 4,
+                vS,
+                RIGHT_PANEL_SIZE - PADDING * 3,
+                vS + TEXT_SIZE / 3,
+                "Then click location to paste"
+        );
         panel.addControl(copy);
         panel.addControl(makeBody);
-
+        panel.addControl(pasteLabel);
         return panel;
     }
 
@@ -178,14 +254,32 @@ public class GUI {
     }
 
     public SlidePanel constructMainPanel(PApplet applet, Iterator planets) {
-        SlidePanel panel = new SlidePanel(applet, 0, 0, LEFT_PANEL_SIZE, applet.height, "", TEXT_SIZE - PADDING);
+        SlidePanel panel = new SlidePanel(
+                applet,
+                0,
+                0,
+                LEFT_PANEL_SIZE,
+                applet.height,
+                "",
+                TEXT_SIZE - PADDING
+        );
         panel.setDraggable(false);
         if (SEARCH == null) {
             GPanel searchPanel = new GPanel(applet, 0, 0, panel.getWidth(), TEXT_SIZE, "Celestial Bodies");
-            SEARCH = new GTextField(applet, PADDING, TEXT_SIZE / 2 - 15, panel.getWidth() - PADDING, TEXT_SIZE / 2 + 15);
+            GLabel label = new GLabel(
+                    applet,
+                    PADDING,
+                    PADDING,
+                    panel.getWidth() - PADDING,
+                    PADDING * 3,
+                    "Planet filter:"
+            );
+            label.setFont(SMALLER_FONT);
+            SEARCH = new GTextField(applet, PADDING, PADDING * 4, panel.getWidth() - PADDING, PADDING * 6);
             SEARCH.addEventHandler(this, "searchTyped");
             SEARCH.setFont(DEFAULT_FONT);
             searchPanel.addControl(SEARCH);
+            searchPanel.addControl(label);
             panel.addControl(searchPanel);
         }
         addPlanetsToLeft(panel, applet, planets);
