@@ -100,7 +100,23 @@ public class GUI {
         reduceScale.addEventHandler(this, "subScale");
         panel.addControl(addScale);
         panel.addControl(reduceScale);
+
+        GButton toggleLabels = new GButton(
+                applet,
+                PADDING * 12,
+                PADDING / 2,
+                PADDING * 18,
+                PADDING * 5 / 2,
+                "Toggle labels"
+        );
+        toggleLabels.addEventHandler(this,"toggleLabels");
+        panel.addControl(toggleLabels);
         return panel;
+    }
+
+    //G4P GUI lib calls handlers via reflection. Handler for toggle labels button.
+    public void toggleLabels(GButton button, GEvent event) {
+        Parameters.setDrawLabels(!Parameters.isDrawLabels());
     }
 
     //G4P GUI lib calls handlers via reflection. Handler for increase scale button.

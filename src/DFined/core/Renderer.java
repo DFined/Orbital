@@ -47,6 +47,7 @@ public class Renderer {
 
     //Main rendering method for the app. Utilizes opengl wrapper from PGraphics heavily
     public void render(PGraphics graphics, SolarSystemState system, float mouseX, float mouseY) {
+        graphics.textSize(50);
         graphics.background(0);
 
         //graphics.text(applet.frameRate, 20, 50);

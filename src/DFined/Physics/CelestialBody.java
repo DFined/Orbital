@@ -1,11 +1,9 @@
 package DFined.Physics;
 
+import DFined.core.Parameters;
 import DFined.core.Renderer;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import processing.core.PApplet;
-import processing.core.PGraphics;
-import processing.core.PImage;
-import processing.core.PShape;
+import processing.core.*;
 import processing.opengl.PGraphics3D;
 
 import java.util.List;
@@ -50,8 +48,12 @@ public class CelestialBody {
     public void draw(Renderer renderer, PGraphics graphics) {
         graphics.pushMatrix();
         graphics.shape(shape);
-        graphics.scale(1 / renderer.getScale());
+        graphics.scale(1.f / renderer.getScale());
         graphics.shape(marker);
+        if(Parameters.isDrawLabels()) {
+            graphics.rotateX(PConstants.PI / 2);
+            graphics.text(name, -name.length() * 15, -80, 0);
+        }
         graphics.popMatrix();
     }
 
