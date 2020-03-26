@@ -24,7 +24,7 @@ public class BodyParameters {
     public static final String MIMAS = "mimas";
     public static final String URANUS = "uranus";
     public static final String NEPTUNE = "neptune";
-    public static final String PLUTO =  "pluto";
+    public static final String PLUTO = "pluto";
     private static Gson gson = new Gson();
 
     private static final HashMap<String, BodyParameters> presets = new HashMap<>();
@@ -35,15 +35,15 @@ public class BodyParameters {
     private String registryName;
     private String displayName;
 
-    public static void addPreset(String json){
-        BodyParameters preset = gson.fromJson(json,BodyParameters.class);
-        presets.put(preset.getRegistryName(),preset);
+    //Function for deserializing and registring a celestial body parameters preset
+    public static void addPreset(String json) {
+        BodyParameters preset = gson.fromJson(json, BodyParameters.class);
+        presets.put(preset.getRegistryName(), preset);
     }
 
-    public static BodyParameters getPreset(String key){
+    public static BodyParameters getPreset(String key) {
         return presets.get(key);
     }
-
 
 
     public void setMass(double mass) {

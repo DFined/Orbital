@@ -19,33 +19,36 @@ public class GUI {
     public final GPanel RIGHT_PANEL;
     private SlidePanel LEFT_PANEL;
     private GPanel BOTTOM_PANEL;
+    private GPanel TOP_PANEL;
     public final GView VIEW;
+    public static final int PADDING = 15;
     private static final int LEFT_PANEL_SIZE = 200;
     private static final int RIGHT_PANEL_SIZE = 300;
-    public static final int TEXT_SIZE = 100;
-    public static final int PADDING = 15;
     private static final int BOTTOM_PANEL_SIZE = PADDING * 6;
+    private static final int TOP_PANEL_SIZE = PADDING * 3;
+    public static final int TEXT_SIZE = 100;
     private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 22);
     private static final Font SMALLER_FONT = new Font("Monospaced", Font.PLAIN, 16);
+    private static GSlider SCALE_SLIDER;
     private static GTextField NAME;
     private static GTextField MASS;
     private static GTextField RADIUS;
     private static GTextField SEARCH;
     private static GTextField TIME_SPEED;
     private static GTextField CURRENT_TIME;
-    private static GTextField PASTE_LABEL;
 
 
     public void update() {
         CURRENT_TIME.setText(Util.formatSeconds(Math.round(Physics.getTime())));
     }
 
+    //Constructor initializes all the gui elements
     public GUI(PApplet applet) {
         G4P.setCtrlMode(GControlMode.CORNERS);
         this.VIEW = new GView(
                 applet,
                 LEFT_PANEL_SIZE,
-                0,
+                TOP_PANEL_SIZE,
                 applet.width - RIGHT_PANEL_SIZE,
                 applet.height - BOTTOM_PANEL_SIZE,
                 P3D
@@ -54,9 +57,63 @@ public class GUI {
         this.RIGHT_PANEL = constructInfoPanel(applet);
         this.LEFT_PANEL = constructMainPanel(applet, Model.getSystem().iterator());
         this.BOTTOM_PANEL = constructBottomPanel(applet);
-
+        this.TOP_PANEL = constructTopPanel(applet);
     }
 
+    //Initialization of top gui panel
+    private GPanel constructTopPanel(PApplet applet) {
+        GPanel panel = new GPanel(
+                applet,
+                LEFT_PANEL_SIZE,
+                0,
+                applet.width - RIGHT_PANEL_SIZE,
+                TOP_PANEL_SIZE
+        );
+        panel.setOpaque(false);
+        GLabel scaleLabel = new GLabel(
+                applet,
+                PADDING,
+                PADDING / 2,
+                PADDING * 4,
+                PADDING * 5 / 2,
+                "Scale:"
+        );
+
+        panel.addControl(scaleLabel);
+        GButton addScale = new GButton(
+                applet,
+                PADDING * 5,
+                PADDING / 2,
+                PADDING * 7,
+                PADDING * 5 / 2,
+                "+"
+        );
+        GButton reduceScale = new GButton(
+                applet,
+                PADDING * 8,
+                PADDING / 2,
+                PADDING * 10,
+                PADDING * 5 / 2,
+                "-"
+        );
+        addScale.addEventHandler(this, "plusScale");
+        reduceScale.addEventHandler(this, "subScale");
+        panel.addControl(addScale);
+        panel.addControl(reduceScale);
+        return panel;
+    }
+
+    //G4P GUI lib calls handlers via reflection. Handler for increase scale button.
+    public void plusScale(GButton button, GEvent event) {
+        Model.getRenderer().setScale(Model.getRenderer().getScale() * 1.2f);
+    }
+
+    //G4P GUI lib calls handlers via reflection. Handler for decrease scale button.
+    public void subScale(GButton button, GEvent event) {
+        Model.getRenderer().setScale(Model.getRenderer().getScale() * 1 / 1.2f);
+    }
+
+    //Initialization of bottom gui panel
     private GPanel constructBottomPanel(PApplet applet) {
         int WIDTH = applet.width - RIGHT_PANEL_SIZE - LEFT_PANEL_SIZE;
         GPanel panel = new GPanel(
@@ -94,6 +151,7 @@ public class GUI {
         tpsLabel.setText("Time speed multiplier");
         tpsLabel.setFont(SMALLER_FONT);
         TIME_SPEED.setFont(DEFAULT_FONT);
+        TIME_SPEED.setText("0");
         panel.addControl(TIME_SPEED);
         panel.addControl(tpsLabel);
         panel.addControl(apply);
@@ -123,6 +181,7 @@ public class GUI {
         return panel;
     }
 
+    //G4P GUI lib calls handlers via reflection. Handler for Apply button for time speed changes.
     public void timeSpeedChanged(GButton button, GEvent event) {
         if (event == GEvent.CLICKED) {
             int tpd = 0;
@@ -141,6 +200,7 @@ public class GUI {
         }
     }
 
+    //Filter function for searching relevant planets by name
     public Iterator<CelestialBody> updatePlanets(SolarSystemState system, String filter) {
         if (!filter.isEmpty()) {
             return system.get().stream().filter(
@@ -150,6 +210,7 @@ public class GUI {
         return system.iterator();
     }
 
+    //Function for adding planet selector buttons to left panel after a search
     public void addPlanetsToLeft(GPanel panel, PApplet applet, Iterator<CelestialBody> planets) {
         int i = 0;
         for (; planets.hasNext(); i++) {
@@ -168,8 +229,16 @@ public class GUI {
         }
     }
 
+    //Initialization of right gui panel
     public GPanel constructInfoPanel(PApplet applet) {
-        GPanel panel = new GPanel(applet, applet.width - RIGHT_PANEL_SIZE, 0, applet.width, applet.height, "");
+        GPanel panel = new GPanel(
+                applet,
+                applet.width - RIGHT_PANEL_SIZE,
+                0,
+                applet.width,
+                applet.height,
+                ""
+        );
         panel.setDraggable(false);
         NAME = new GTextField(
                 applet,
@@ -244,15 +313,33 @@ public class GUI {
         panel.addControl(copy);
         panel.addControl(makeBody);
         panel.addControl(pasteLabel);
+        GButton exit = new GButton(
+                applet,
+                PADDING * 3,
+                applet.height - PADDING * 3,
+                RIGHT_PANEL_SIZE - PADDING * 3,
+                applet.height - PADDING,
+                "EXIT"
+        );
+        exit.setFont(DEFAULT_FONT);
+        exit.addEventHandler(this, "exit");
+        panel.addControl(exit);
         return panel;
     }
 
+    //G4P GUI lib calls handlers via reflection. Handler for exit button.
+    public void exit(GButton button, GEvent event) {
+        button.getPApplet().exit();
+    }
+
+    //Function which updates info displayed about body when focus is changed
     public void updateInfo(CelestialBody body) {
         NAME.setText(body.getName());
         MASS.setText(Double.toString(body.getMass()));
         RADIUS.setText(Double.toString(body.getRadius()));
     }
 
+    //Initialization of left gui panel
     public SlidePanel constructMainPanel(PApplet applet, Iterator planets) {
         SlidePanel panel = new SlidePanel(
                 applet,
@@ -286,6 +373,7 @@ public class GUI {
         return panel;
     }
 
+    //G4P GUI lib calls handlers via reflection. Handler for planet selector buttons in list on left panel.
     public void planetPressed(GButton button, GEvent event) {
         if (event == GEvent.CLICKED || event == GEvent.PRESSED) {
             Model.getRenderer().setFocus(
@@ -296,12 +384,14 @@ public class GUI {
         }
     }
 
+    //G4P GUI lib calls handlers via reflection. Handler for search filed being typed.
     public void searchTyped(GTextField textField, GEvent event) {
         if (event == GEvent.CHANGED) {
             reconstructMainPanel();
         }
     }
 
+    //Function for reconstructing list of planet selector buttons on left panel after the search filter is changed.
     public void reconstructMainPanel() {
         String filter = SEARCH.getText();
         PApplet applet = SEARCH.getPApplet();
@@ -310,6 +400,7 @@ public class GUI {
         addPlanetsToLeft(LEFT_PANEL, applet, updatePlanets(Model.getSystem(), filter.trim()));
     }
 
+    //G4P GUI lib calls handlers via reflection. Handler for copy body button.
     public void copyBodyEvent(GButton textField, GEvent event) {
         if (event == GEvent.CLICKED) {
             copy = Model.getRenderer().getFocus();

@@ -29,6 +29,7 @@ public class Model extends PApplet {
         system = new SolarSystemState();
     }
 
+    //PApplet method required for some pre-start settings
     @Override
     public void settings() {
         size(1000, 700, P3D);
@@ -36,6 +37,7 @@ public class Model extends PApplet {
         fullScreen();
     }
 
+    //Load and deserialize all of the required data from disk. Planet data, later Solar system data.
     public static void loadResources() {
         File data = new File("resources/Data");
         Collection<File> resources = FileUtils.listFiles(data, FileFilterUtils.trueFileFilter(), FileFilterUtils.trueFileFilter());
@@ -48,6 +50,8 @@ public class Model extends PApplet {
         }
     }
 
+
+    //PApplet method for setup to be run once before main loop
     public void setup() {
         loadResources();
 
@@ -55,45 +59,45 @@ public class Model extends PApplet {
 
         stroke(255);
 
-        this.addBody(BodyParameters.SUN, 0, 0, true);
+        system.addBody(BodyParameters.SUN, 0, 0, true, this);
 
-        this.addBody(BodyParameters.MERCURY, 69816900000L, 38860f, false);
+        system.addBody(BodyParameters.MERCURY, 69816900000L, 38860f, false, this);
 
-        this.addBody(BodyParameters.VENUS, -108940000000L, -(34780f), false);
+        system.addBody(BodyParameters.VENUS, -108940000000L, -(34780f), false, this);
 
-        CelestialBody earth = this.addBody(BodyParameters.EARTH, 152098233000L, 29292f, false);
+        CelestialBody earth = system.addBody(BodyParameters.EARTH, 152098233000L, 29292f, false, this);
 
-        this.attachBody(BodyParameters.MOON, -405500000L, 970f, earth);
+        system.attachBody(BodyParameters.MOON, -405500000L, 970f, earth, this);
 
-        CelestialBody mars = this.addBody(BodyParameters.MARS, -249200000000L, -22000f, false);
+        CelestialBody mars = system.addBody(BodyParameters.MARS, -249200000000L, -22000f, false, this);
 
-        this.attachBody(BodyParameters.PHOBOS, -9517000L, 2138f, mars);
+        system.attachBody(BodyParameters.PHOBOS, -9517000L, 2138f, mars, this);
 
-        this.attachBody(BodyParameters.DEIMOS, -23470000L, 1351f, mars);
+        system.attachBody(BodyParameters.DEIMOS, -23470000L, 1351f, mars, this);
 
-        CelestialBody jupiter = this.addBody(BodyParameters.JUPITER, 816620000000L, 12440f, false);
+        CelestialBody jupiter = system.addBody(BodyParameters.JUPITER, 816620000000L, 12440f, false, this);
 
-        this.attachBody(BodyParameters.EUROPA, 676938000L, 13740f, jupiter);
+        system.attachBody(BodyParameters.EUROPA, 676938000L, 13740f, jupiter, this);
 
-        this.attachBody(BodyParameters.GANYMEDE, -1071600000L, 10880f, jupiter);
+        system.attachBody(BodyParameters.GANYMEDE, -1071600000L, 10880f, jupiter, this);
 
-        this.attachBody(BodyParameters.IO, -423400000L, 17334f, jupiter);
+        system.attachBody(BodyParameters.IO, -423400000L, 17334f, jupiter, this);
 
-        this.attachBody(BodyParameters.CALLISTO, 1897000000L, 8204f, jupiter);
+        system.attachBody(BodyParameters.CALLISTO, 1897000000L, 8204f, jupiter, this);
 
-        CelestialBody saturn = this.addBody(BodyParameters.SATURN, -1514500000000L, -9090f, false);
+        CelestialBody saturn = system.addBody(BodyParameters.SATURN, -1514500000000L, -9090f, false, this);
 
-        this.attachBody(BodyParameters.TITAN, 1257060000L, 5570f, saturn);
+        system.attachBody(BodyParameters.TITAN, 1257060000L, 5570f, saturn, this);
 
-        this.attachBody(BodyParameters.ENCELADUS, -239156000L, 12635f, saturn);
+        system.attachBody(BodyParameters.ENCELADUS, -239156000L, 12635f, saturn, this);
 
-        this.attachBody(BodyParameters.MIMAS, 189176000L, 14280f, saturn);
+        system.attachBody(BodyParameters.MIMAS, 189176000L, 14280f, saturn, this);
 
-        this.addBody(BodyParameters.URANUS, 3003620000000L, 6490f, false);
+        system.addBody(BodyParameters.URANUS, 3003620000000L, 6490f, false, this);
 
-        this.addBody(BodyParameters.NEPTUNE, -4545670000000L, -5370f, false);
+        system.addBody(BodyParameters.NEPTUNE, -4545670000000L, -5370f, false, this);
 
-        this.addBody(BodyParameters.PLUTO, -7375930000000L, -3710f, false);
+        system.addBody(BodyParameters.PLUTO, -7375930000000L, -3710f, false, this);
 
         gui = new GUI(this);
 
@@ -105,7 +109,9 @@ public class Model extends PApplet {
         return renderer;
     }
 
+    //PApplet method - called as main loop regularly with a maintained frame rate
     public void draw() {
+        background(181, 171, 255);
         double dt = ((float) (millis() - lastTick)) / 1000;
         lastTick = millis();
         Physics.tick(dt, system);
@@ -120,6 +126,7 @@ public class Model extends PApplet {
         return system;
     }
 
+    //Handler for mouse wheel events. Used to change renderer scale as alternative to scale buttons in gui
     @Override
     public void mouseWheel(MouseEvent event) {
         if (event.getCount() > 0) {
@@ -131,23 +138,5 @@ public class Model extends PApplet {
 
     public static GUI getGui() {
         return gui;
-    }
-
-    private CelestialBody addBody(String registryName, long apoapsis, float apoV, boolean central) {
-        return system.add(new CelestialBody(BodyParameters.getPreset(registryName))
-                .setKinetics(central, apoapsis, apoV)
-                .initGraphics(this)
-        );
-    }
-
-    private void attachBody(String registryName, long apoapsis, float apoV, CelestialBody center) {
-        system.add(new CelestialBody(BodyParameters.getPreset(registryName))
-                .setKinetics(
-                        false,
-                        center.getPosition().getX() * Physics.DISTANCE_SCALE + apoapsis,
-                        center.getVelocity().getZ() * Physics.DISTANCE_SCALE + apoV
-                )
-                .initGraphics(this)
-        );
     }
 }

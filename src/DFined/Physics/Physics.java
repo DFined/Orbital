@@ -1,7 +1,5 @@
 package DFined.Physics;
 
-import DFined.core.Parameters;
-
 import static DFined.core.Parameters.MAX_TIME_STEP;
 import static DFined.core.Parameters.TARGET_TPS;
 
@@ -16,6 +14,7 @@ public class Physics {
     private static int timeSpeed = 0;
     private static int physicsStepsPerGraphicsStep = 0;
 
+    //Calculate required delta-T and step count and perform physics ticks.
     public static void tick(double dt, SolarSystemState system) {
         int timeStep = 1;
         if (timeSpeed < TARGET_TPS) {

@@ -1,6 +1,7 @@
 package DFined;
 
 public class Util {
+    //Convert second timestamp to human-readable format
     public static String formatSeconds(long secs) {
         int years = (int) (secs / 31536000);
         int yr = (int) (secs % 31536000);
@@ -14,10 +15,12 @@ public class Util {
         return String.format("y:%d; d: %d; h: %d; m: %d; s: %d;", years, days, hours, minutes, seconds);
     }
 
+    //Utility constrain function
     public static double constrain(double low, double high, double value) {
         return Math.max(Math.min(value, high), low);
     }
 
+    //Utility constrain function
     public static int constrain(int low, int high, int value) {
         return Math.max(Math.min(value, high), low);
     }

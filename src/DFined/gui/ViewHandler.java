@@ -8,27 +8,30 @@ import processing.core.PGraphics;
 
 public class ViewHandler extends GViewListener {
 
+    //Handler for the main 3D view for Per-tick events. Used mainly for rendering.
     @Override
     public void update() {
         PGraphics graphics = getGraphics();
         graphics.beginDraw();
-        Model.getRenderer().render(graphics, Model.getSystem(), mouseX() - width()/2.f, mouseY() - height()/2.f);
+        Model.getRenderer().render(graphics, Model.getSystem(), mouseX() - width() / 2.f, mouseY() - height() / 2.f);
         graphics.endDraw();
         invalidate();
     }
 
+    //Handler for the main 3D view for mouse drag events.
     @Override
     public void mouseDragged() {
         Model.getRenderer().mouseDragged(mouseX(), mouseY());
     }
 
+    //Handler for the main 3D view for mouse press events.
     @Override
     public void mousePressed() {
         Renderer renderer = Model.getRenderer();
         if (button() == LEFT) {
             renderer.mousePressed(mouseX(), mouseY());
         }
-        Vector3D pos = renderer.mouseToLocal(mouseX() - width()/2.f, mouseY() - height()/2.f);
+        Vector3D pos = renderer.mouseToLocal(mouseX() - width() / 2.f, mouseY() - height() / 2.f);
         if (Model.getGui().copy != null) {
             Model.getSystem().add(
                     Model.getGui().copy.clone(pos.add(renderer.getFocus().getPosition()), getPApplet())
@@ -38,13 +41,7 @@ public class ViewHandler extends GViewListener {
         }
     }
 
-    @Override
-    public void mouseMoved() {
-        if(Model.getGui().copy != null){
-
-        }
-    }
-
+    //Handler for the main 3D view for mouse entered events. Used to exclude bugs with the rest of the gui
     @Override
     public void mouseEntered() {
         getPApplet().noCursor();
@@ -52,6 +49,7 @@ public class ViewHandler extends GViewListener {
         invalidate();
     }
 
+    //Handler for the main 3D view for mouse exited events.
     @Override
     public void mouseExited() {
         getPApplet().cursor();

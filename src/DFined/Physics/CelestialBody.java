@@ -21,6 +21,11 @@ public class CelestialBody {
     private PImage textureImage;
     private Orbit orbit = new Orbit(this);
     private PApplet applet;
+    private boolean central;
+    private Vector3D position;
+    private Vector3D velocity;
+    private Vector3D acceleration = new Vector3D(0, 0, 0);
+    private double maximumA = 0;
 
     public CelestialBody(BodyParameters params) {
         this.mass = params.getMass();
@@ -34,29 +39,27 @@ public class CelestialBody {
         return orbit;
     }
 
-    public void postTick(){
-        clearAcceleration();
-    }
-
-    public void update(){
-        if(!this.isCentral()) {
+    //Method for updating orbital parameters each tick.
+    public void update() {
+        if (!this.isCentral()) {
             this.orbit.update();
         }
     }
 
-
-    public void draw(Renderer renderer, PGraphics graphics){
+    //Self-render method. Draws the body. All necessary transforms are handled by the renderer.
+    public void draw(Renderer renderer, PGraphics graphics) {
         graphics.pushMatrix();
         graphics.shape(shape);
-        graphics.scale(1/renderer.getScale());
+        graphics.scale(1 / renderer.getScale());
         graphics.shape(marker);
         graphics.popMatrix();
     }
 
+    //Initialize required PGraphics elements for rendering.
     public CelestialBody initGraphics(PApplet pApplet) {
-        shape = pApplet.createShape(pApplet.SPHERE, (float) (radius/Physics.DISTANCE_SCALE));
+        shape = pApplet.createShape(pApplet.SPHERE, (float) (radius / Physics.DISTANCE_SCALE));
         shape.setStroke(false);
-        if(textureImage == null) {
+        if (textureImage == null) {
             textureImage = pApplet.loadImage(texture);
         }
         shape.setTexture(textureImage);
@@ -79,12 +82,13 @@ public class CelestialBody {
         return radius;
     }
 
-    public CelestialBody clone(Vector3D pos, PApplet applet){
+    //Create a parameter-wise copy of this body. Used by the copy button in gui.
+    public CelestialBody clone(Vector3D pos, PApplet applet) {
         CelestialBody clone = new CelestialBody(BodyParameters.getPreset(this.registryName)).initGraphics(applet);
-        int rand = (int)applet.random(0,10000);
+        int rand = (int) applet.random(0, 10000);
         clone.setName("Planet " + rand);
         clone.setRegistryName("planet_" + rand);
-        return clone.setKinetics(clone,this.isCentral(), pos, this.getVelocity(), Vector3D.ZERO);
+        return clone.setKinetics(this.isCentral(), pos, this.getVelocity(), Vector3D.ZERO);
     }
 
     protected void setRegistryName(String registryName) {
@@ -107,12 +111,7 @@ public class CelestialBody {
         return applet;
     }
 
-    private boolean central;
-    private Vector3D position;
-    private Vector3D velocity;
-    private Vector3D acceleration = new Vector3D(0, 0, 0);
-    private double maximumA = 0;
-
+    //Set body kinetics from apoapsis and velocity at apoapsis. Central argument only for orbit calculation
     public CelestialBody setKinetics(boolean central, double apoapsis, double minimumV) {
         this.central = central;
         this.position = new Vector3D(apoapsis / Physics.DISTANCE_SCALE, 0, 0);
@@ -121,7 +120,13 @@ public class CelestialBody {
         return this;
     }
 
-    public CelestialBody setKinetics(CelestialBody body, boolean central, Vector3D position, Vector3D velocity, Vector3D acceleration) {
+    //Set body kinetics directly. Central argument only for orbit calculation
+    public CelestialBody setKinetics(
+            boolean central,
+            Vector3D position,
+            Vector3D velocity,
+            Vector3D acceleration
+    ) {
         this.central = central;
         this.position = position;
         this.velocity = velocity;
@@ -129,6 +134,7 @@ public class CelestialBody {
         return this;
     }
 
+    //Add acceleration to this body. Also calculate influence factor from source for orbit calculations.
     public void addAcceleration(Vector3D accel, CelestialBody source, double dist) {
 
         if (accel.getNorm() / dist > maximumA && !isCentral()) {
@@ -151,10 +157,6 @@ public class CelestialBody {
         return velocity;
     }
 
-    public Vector3D getAcceleration() {
-        return acceleration;
-    }
-
     public double getX() {
         return position.getX();
     }
@@ -167,20 +169,23 @@ public class CelestialBody {
         return position.getZ();
     }
 
+    //Clear acceleration at the end of every physics tick
     public void clearAcceleration() {
         this.acceleration = new Vector3D(0, 0, 0);
     }
 
+    //Perform Physics tick and apply acceleration and velocity
     public void tick(double deltaT) {
         velocity = this.velocity.add(deltaT, this.acceleration);
         position = this.position.add(deltaT, this.velocity);
     }
 
+    //Main method for calculating gravitational attraction
     public void calculateInfluence(SolarSystemState bodyStates, List<CelestialBody> others) {
         for (CelestialBody other : others) {
             Vector3D radius = position.subtract(other.position);
-            double collDist = other.getRadius()/Physics.DISTANCE_SCALE + this.getRadius()/Physics.DISTANCE_SCALE;
-            if(radius.getNorm() <= collDist){
+            double collDist = other.getRadius() / Physics.DISTANCE_SCALE + this.getRadius() / Physics.DISTANCE_SCALE;
+            if (radius.getNorm() <= collDist) {
                 bodyStates.collide(this, other);
             }
             double semiForce = Physics.BIGG / (radius.getNormSq() * Physics.DISTANCE_SCALE);
@@ -194,15 +199,12 @@ public class CelestialBody {
         }
     }
 
+    //Exert gravitational influence over other body. Could be overridden for smaller bodies to negate influence.
     public void influenceOther(Vector3D accel, CelestialBody other, double rad) {
         other.addAcceleration(accel, this, rad);
     }
 
     protected void setVelocity(Vector3D velocity) {
         this.velocity = velocity;
-    }
-
-    public void setAcceleration(Vector3D acceleration) {
-        this.acceleration = acceleration;
     }
 }

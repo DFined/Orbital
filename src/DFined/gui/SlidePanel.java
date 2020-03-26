@@ -10,6 +10,7 @@ public class SlidePanel extends GPanel {
     private static float sliderVal = 0f;
     GSlider slider;
 
+    //GUI class for a panel with an included scroll-slider
     public SlidePanel(PApplet theApplet, float xs, float ys, float xe, float ye, String label, int offset) {
         super(theApplet, xs, ys, xe, ye, label);
         width = xe - xs;
@@ -28,6 +29,7 @@ public class SlidePanel extends GPanel {
         this.addControl(slider);
     }
 
+    //G4P gui lib calls handlers via reflection. Handler for the scrollbar slider update
     public void onSliderUpdate(GSlider slider, GEvent event) {
         float dVal = slider.getValueF() - sliderVal;
         int tabSize = GUI.TEXT_SIZE / 3 + GUI.PADDING;
@@ -43,11 +45,12 @@ public class SlidePanel extends GPanel {
         sliderVal = slider.getValueF();
     }
 
-    public void resetSlider(){
+    public void resetSlider() {
         sliderVal = 0f;
         slider.setValue(0f);
     }
 
+    //Function for destroying old panel when a new one is needed
     public void dispose() {
         for (int i = children.size() - 1; i >= 0; i--) {
             if (!(children.get(i) instanceof GPanel) && !(children.get(i) instanceof GSlider)) {

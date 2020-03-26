@@ -49,14 +49,16 @@ public class SolarSystemState implements Iterable<CelestialBody> {
         return bodies;
     }
 
+    //Calculate all mutual gravitational influences of the bodies in this system
     public void calculateInfluence() {
         for (int i = 0; i < this.size() - 1; i++) {
             this.get(i).calculateInfluence(this, this.get().subList(i + 1, this.size()));
         }
     }
 
+    //Perform actual physics update to velocities and positions. Also add/remove required bodies for any collisions.
     public void step(double dt) {
-        if(bodies.addAll(toAdd) || bodies.removeAll(toRemove)) {
+        if (bodies.addAll(toAdd) || bodies.removeAll(toRemove)) {
             toAdd.clear();
             toRemove.clear();
             Model.getGui().reconstructMainPanel();
@@ -72,6 +74,8 @@ public class SolarSystemState implements Iterable<CelestialBody> {
         }
     }
 
+    /*Handle collisions between bodies. Cant add or remove bodies here, because of concurrent modifiation,
+    so they are queued*/
     public void collide(CelestialBody CelestialBody, CelestialBody other) {
         CelestialBody larger = CelestialBody;
         CelestialBody smaller = other;
@@ -87,9 +91,29 @@ public class SolarSystemState implements Iterable<CelestialBody> {
                 larger.getVelocity()
                         .scalarMultiply(larger.getMass() / 2)
                         .add(smaller.getMass() / 2, smaller.getVelocity())
-                        .scalarMultiply(1/(larger.getMass() + smaller.getMass()))
+                        .scalarMultiply(1 / (larger.getMass() + smaller.getMass()))
         );
         larger.initGraphics(larger.getApplet());
         this.toRemove.add(smaller);
+    }
+
+    //Create new body from planetary and kinetics parameters
+    public CelestialBody addBody(String registryName, long apoapsis, float apoV, boolean central, PApplet applet) {
+        return add(new CelestialBody(BodyParameters.getPreset(registryName))
+                .setKinetics(central, apoapsis, apoV)
+                .initGraphics(applet)
+        );
+    }
+
+    //Create new body from planetary and kinetics parameters relative to existing body
+    public void attachBody(String registryName, long apoapsis, float apoV, CelestialBody center, PApplet applet) {
+        add(new CelestialBody(BodyParameters.getPreset(registryName))
+                .setKinetics(
+                        false,
+                        center.getPosition().getX() * Physics.DISTANCE_SCALE + apoapsis,
+                        center.getVelocity().getZ() * Physics.DISTANCE_SCALE + apoV
+                )
+                .initGraphics(applet)
+        );
     }
 }

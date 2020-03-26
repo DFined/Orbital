@@ -10,6 +10,8 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PShape;
 
+import java.sql.SQLOutput;
+
 public class Renderer {
     private float scale = 0.1f;
     private static final double PI = 3.1415926535;
@@ -20,6 +22,7 @@ public class Renderer {
     private PApplet applet;
     CelestialBody focus;
 
+    //Focus is the celestial body on which the camera is centered
     public CelestialBody getFocus() {
         return focus;
     }
@@ -42,14 +45,16 @@ public class Renderer {
 
     private static int i = 0;
 
+    //Main rendering method for the app. Utilizes opengl wrapper from PGraphics heavily
     public void render(PGraphics graphics, SolarSystemState system, float mouseX, float mouseY) {
         graphics.background(0);
 
-        graphics.text(applet.frameRate, 20, 50);
-        graphics.text(scale, 20, 100);
-        graphics.text(Physics.getTimeSpeed(), 20, 200);
+        //graphics.text(applet.frameRate, 20, 50);
+        //graphics.text(scale, 20, 100);
+
+        //graphics.text(Physics.getTimeSpeed(), 20, 200);
         if (!focus.isCentral()) {
-            graphics.text(focus.getOrbit().toString(), 20, 250);
+            //graphics.text(focus.getOrbit().toString(), 20, 250);
         }
 
         graphics.perspective((float) (PI / 3.0), (float) graphics.width / graphics.height, 1, 1000000000);
@@ -87,7 +92,7 @@ public class Renderer {
         Model.getGui().updateInfo(focus);
     }
 
-
+    //Mouse drag handler for pitch/yaw changes. Called externally from gui.ViewHandler
     public void mouseDragged(int x, int y) {
         if (isDragging) {
             double dx = x - this.lastMouse.getX();
@@ -100,6 +105,7 @@ public class Renderer {
         lastMouse = new Vector2D(x, y);
     }
 
+    //Transforms mouse coordinate in screen space to the coordinate in the Solar System plane
     public Vector3D mouseToLocal(float mouseX, float mouseY) {
         Vector3D pos = new Vector3D(mouseX, 0, mouseY);
         pos = pos.scalarMultiply(PI / getScale());
@@ -110,12 +116,9 @@ public class Renderer {
         return pos;
     }
 
+    //Mouse press handler. Called externally from gui.ViewHandler
     public void mousePressed(int x, int y) {
         lastMouse = new Vector2D(x, y);
-    }
-
-    public float getPitch() {
-        return pitch;
     }
 
     public float getYaw() {
