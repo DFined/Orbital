@@ -1,7 +1,7 @@
 package DFined.Physics;
 
-import static DFined.core.Parameters.MAX_TIME_STEP;
-import static DFined.core.Parameters.TARGET_TPS;
+import static DFined.core.SimulationParameters.MAX_TIME_STEP;
+import static DFined.core.SimulationParameters.TARGET_TPS;
 
 public class Physics {
     public static final long MASS_SCALE = 1000000000000000000L;
@@ -27,33 +27,28 @@ public class Physics {
             physicsStepsPerGraphicsStep = timeSpeed / MAX_TIME_STEP;
         }
         double deltaT = dt * timeStep;
-        try {
-            for (int it = 0; it < Math.max(1, physicsStepsPerGraphicsStep); it++) {
-                system.calculateInfluence();
-                if (physicsStepsPerGraphicsStep > 0) {
-                    system.step(deltaT);
-                    time += deltaT;
-                }
-                system.clearAcceleration();
+
+        for (int it = 0; it < Math.max(1, physicsStepsPerGraphicsStep); it++) {
+            system.calculateInfluence();
+            if (physicsStepsPerGraphicsStep > 0) {
+                system.step(deltaT);
+                time += deltaT;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            system.clearAcceleration();
         }
 
-        for (CelestialBody state : system) {
-            state.update();
-        }
+        system.update();
     }
 
     public static double getTime() {
         return time;
     }
 
-    public static int getTimeSpeed() {
-        return timeSpeed;
-    }
-
     public static void setTimeSpeed(int timeSpeed) {
         Physics.timeSpeed = timeSpeed;
+    }
+
+    public static void resetTime() {
+        time = 0;
     }
 }

@@ -5,8 +5,10 @@ import DFined.Physics.Physics;
 import DFined.Physics.SolarSystemState;
 import DFined.Util;
 import DFined.core.Model;
-import DFined.core.Parameters;
+import DFined.core.SimulationParameters;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import g4p_controls.*;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import processing.core.PApplet;
 
 import java.awt.*;
@@ -15,6 +17,7 @@ import java.util.Iterator;
 import static processing.core.PConstants.P3D;
 
 public class GUI {
+    public boolean lockInfo = false;
     public CelestialBody copy = null;
     public final GPanel RIGHT_PANEL;
     private SlidePanel LEFT_PANEL;
@@ -36,10 +39,14 @@ public class GUI {
     private static GTextField SEARCH;
     private static GTextField TIME_SPEED;
     private static GTextField CURRENT_TIME;
+    private static GTextField VX;
+    private static GTextField VY;
+    private static GTextField VZ;
 
 
     public void update() {
         CURRENT_TIME.setText(Util.formatSeconds(Math.round(Physics.getTime())));
+        updateInfo(Model.getRenderer().getFocus(), false);
     }
 
     //Constructor initializes all the gui elements
@@ -109,14 +116,14 @@ public class GUI {
                 PADDING * 5 / 2,
                 "Toggle labels"
         );
-        toggleLabels.addEventHandler(this,"toggleLabels");
+        toggleLabels.addEventHandler(this, "toggleLabels");
         panel.addControl(toggleLabels);
         return panel;
     }
 
     //G4P GUI lib calls handlers via reflection. Handler for toggle labels button.
     public void toggleLabels(GButton button, GEvent event) {
-        Parameters.setDrawLabels(!Parameters.isDrawLabels());
+        SimulationParameters.setDrawLabels(!SimulationParameters.isDrawLabels());
     }
 
     //G4P GUI lib calls handlers via reflection. Handler for increase scale button.
@@ -205,7 +212,7 @@ public class GUI {
                 try {
                     tpd = DFined.Util.constrain(
                             0,
-                            Parameters.MAX_TIME_SPEED,
+                            SimulationParameters.MAX_TIME_SPEED,
                             Integer.parseInt(TIME_SPEED.getText())
                     );
                 } catch (NumberFormatException e) {
@@ -272,7 +279,6 @@ public class GUI {
                 RIGHT_PANEL_SIZE - PADDING,
                 panel.getTabHeight() + PADDING * 2 + TEXT_SIZE * 2 / 4
         );
-        MASS.setTextEditEnabled(false);
         RADIUS = new GTextField(
                 applet,
                 RIGHT_PANEL_SIZE / 2,
@@ -304,6 +310,59 @@ public class GUI {
         panel.addControl(radius);
 
         int vS = TEXT_SIZE * 3 / 4 + PADDING * 5;
+        VX = new GTextField(
+                applet,
+                RIGHT_PANEL_SIZE / 2,
+                vS,
+                RIGHT_PANEL_SIZE - PADDING,
+                vS + TEXT_SIZE / 3
+        );
+        GLabel vx = new GLabel(applet, PADDING, vS, RIGHT_PANEL_SIZE / 2 - PADDING, vS + TEXT_SIZE / 3);
+        vx.setText("Vx (1000 km/s)");
+        panel.addControl(vx);
+        VX.setFont(SMALLER_FONT);
+        panel.addControl(VX);
+        vS += TEXT_SIZE / 3 + PADDING;
+        VY = new GTextField(
+                applet,
+                RIGHT_PANEL_SIZE / 2,
+                vS,
+                RIGHT_PANEL_SIZE - PADDING,
+                vS + TEXT_SIZE / 3
+        );
+        VY.setFont(SMALLER_FONT);
+        panel.addControl(VY);
+        GLabel vy = new GLabel(applet, PADDING, vS, RIGHT_PANEL_SIZE / 2 - PADDING, vS + TEXT_SIZE / 3);
+        vy.setText("Vy (1000 km/s)");
+        panel.addControl(vy);
+        vS += TEXT_SIZE / 3 + PADDING;
+        VZ = new GTextField(
+                applet,
+                RIGHT_PANEL_SIZE / 2,
+                vS,
+                RIGHT_PANEL_SIZE - PADDING,
+                vS + TEXT_SIZE / 3
+        );
+        VZ.setFont(SMALLER_FONT);
+        panel.addControl(VZ);
+        VX.addEventHandler(this, "infoLostFocus");
+        VY.addEventHandler(this, "infoLostFocus");
+        VZ.addEventHandler(this, "infoLostFocus");
+        GLabel vz = new GLabel(applet, PADDING, vS, RIGHT_PANEL_SIZE / 2 - PADDING, vS + TEXT_SIZE / 3);
+        vz.setText("Vz (1000 km/s)");
+        panel.addControl(vz);
+        vS += TEXT_SIZE / 3 + PADDING;
+        GButton apply = new GButton(
+                applet,
+                PADDING * 3,
+                vS,
+                RIGHT_PANEL_SIZE - PADDING * 3,
+                vS + TEXT_SIZE / 3,
+                "Apply Changes"
+        );
+        apply.addEventHandler(this, "applyChanges");
+        panel.addControl(apply);
+        vS += TEXT_SIZE / 3 + PADDING;
         GLabel makeBody = new GLabel(applet, PADDING, vS, RIGHT_PANEL_SIZE - PADDING, vS + TEXT_SIZE / 3);
         makeBody.setFont(DEFAULT_FONT);
         makeBody.setText("Copy selected body:");
@@ -329,6 +388,17 @@ public class GUI {
         panel.addControl(copy);
         panel.addControl(makeBody);
         panel.addControl(pasteLabel);
+        GButton reset = new GButton(
+                applet,
+                PADDING * 3,
+                applet.height - PADDING * 6,
+                RIGHT_PANEL_SIZE - PADDING * 3,
+                applet.height - PADDING * 4,
+                "RESET"
+        );
+        reset.setFont(DEFAULT_FONT);
+        reset.addEventHandler(this, "reset");
+        panel.addControl(reset);
         GButton exit = new GButton(
                 applet,
                 PADDING * 3,
@@ -344,15 +414,47 @@ public class GUI {
     }
 
     //G4P GUI lib calls handlers via reflection. Handler for exit button.
+    public void infoLostFocus(GTextField field, GEvent event) {
+        if (event == GEvent.CHANGED || event == GEvent.GETS_FOCUS) {
+            lockInfo = true;
+        }
+    }
+
+    //G4P GUI lib calls handlers via reflection. Handler for apply changes button.
+    public void applyChanges(GButton button, GEvent event) {
+        Model.getRenderer().getFocus().setVelocity(
+                new Vector3D(
+                        Double.parseDouble(VX.getText()),
+                        Double.parseDouble(VY.getText()),
+                        Double.parseDouble(VZ.getText())
+                )
+        );
+        lockInfo = false;
+    }
+
+    //G4P GUI lib calls handlers via reflection. Handler for reset button.
+    public void reset(GButton button, GEvent event) {
+        Physics.resetTime();
+        Model.getSystem().clear();
+        Model.getInstance().setupDefaultPlanets();
+        Model.getRenderer().setFocus(Model.getSystem().get(0));
+    }
+
+    //G4P GUI lib calls handlers via reflection. Handler for exit button.
     public void exit(GButton button, GEvent event) {
         button.getPApplet().exit();
     }
 
-    //Function which updates info displayed about body when focus is changed
-    public void updateInfo(CelestialBody body) {
-        NAME.setText(body.getName());
-        MASS.setText(Double.toString(body.getMass()));
-        RADIUS.setText(Double.toString(body.getRadius()));
+    //Function which updates info displayed about body when focus is changed and on tick
+    public void updateInfo(CelestialBody body, boolean force) {
+        if ((!lockInfo && !VX.hasFocus() && !VY.hasFocus() && !VZ.hasFocus() && !MASS.hasFocus()) || force) {
+            NAME.setText(body.getName());
+            MASS.setText(Double.toString(body.getMass()));
+            RADIUS.setText(Double.toString(body.getRadius()));
+            VX.setText(String.format("%.7f", body.getVelocity().getX()));
+            VY.setText(String.format("%.7f", body.getVelocity().getY()));
+            VZ.setText(String.format("%.7f", body.getVelocity().getZ()));
+        }
     }
 
     //Initialization of left gui panel

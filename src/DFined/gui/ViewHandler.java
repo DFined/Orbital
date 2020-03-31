@@ -33,11 +33,14 @@ public class ViewHandler extends GViewListener {
         }
         Vector3D pos = renderer.mouseToLocal(mouseX() - width() / 2.f, mouseY() - height() / 2.f);
         if (Model.getGui().copy != null) {
-            Model.getSystem().add(
-                    Model.getGui().copy.clone(pos.add(renderer.getFocus().getPosition()), getPApplet())
+            Model.getRenderer().setFocus(
+                    Model.getSystem().add(
+                            Model.getGui().copy.clone(pos.add(renderer.getFocus().getPosition()))
+                    )
             );
             Model.getGui().copy = null;
             Model.getGui().reconstructMainPanel();
+
         }
     }
 

@@ -52,7 +52,12 @@ public class SolarSystemState implements Iterable<CelestialBody> {
     //Calculate all mutual gravitational influences of the bodies in this system
     public void calculateInfluence() {
         for (int i = 0; i < this.size() - 1; i++) {
-            this.get(i).calculateInfluence(this, this.get().subList(i + 1, this.size()));
+            for (CelestialBody other : this.get().subList(i + 1, this.size())) {
+                CelestialBody collisionRes = this.get(i).calculateInfluence(other);
+                if (!(collisionRes == null)) {
+                    this.toRemove.add(collisionRes);
+                }
+            }
         }
     }
 
@@ -74,34 +79,10 @@ public class SolarSystemState implements Iterable<CelestialBody> {
         }
     }
 
-    /*Handle collisions between bodies. Cant add or remove bodies here, because of concurrent modifiation,
-    so they are queued*/
-    public void collide(CelestialBody CelestialBody, CelestialBody other) {
-        CelestialBody larger = CelestialBody;
-        CelestialBody smaller = other;
-        if (other.getMass() > larger.getMass()) {
-            larger = other;
-            smaller = CelestialBody;
-        }
-        larger.setMass(larger.getMass() + smaller.getMass());
-        larger.setRadius(
-                Math.cbrt(Math.pow(larger.getRadius(), 3) + Math.pow(smaller.getRadius(), 3))
-        );
-        larger.setVelocity(
-                larger.getVelocity()
-                        .scalarMultiply(larger.getMass() / 2)
-                        .add(smaller.getMass() / 2, smaller.getVelocity())
-                        .scalarMultiply(1 / (larger.getMass() + smaller.getMass()))
-        );
-        larger.initGraphics(larger.getApplet());
-        this.toRemove.add(smaller);
-    }
-
     //Create new body from planetary and kinetics parameters
     public CelestialBody addBody(String registryName, long apoapsis, float apoV, boolean central, PApplet applet) {
         return add(new CelestialBody(BodyParameters.getPreset(registryName))
                 .setKinetics(central, apoapsis, apoV)
-                .initGraphics(applet)
         );
     }
 
@@ -113,7 +94,16 @@ public class SolarSystemState implements Iterable<CelestialBody> {
                         center.getPosition().getX() * Physics.DISTANCE_SCALE + apoapsis,
                         center.getVelocity().getZ() * Physics.DISTANCE_SCALE + apoV
                 )
-                .initGraphics(applet)
         );
+    }
+
+    public void update() {
+        for (CelestialBody state : this) {
+            state.update();
+        }
+    }
+
+    public void clear(){
+        bodies.clear();
     }
 }

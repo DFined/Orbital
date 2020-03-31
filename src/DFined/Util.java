@@ -15,12 +15,12 @@ public class Util {
         return String.format("y:%d; d: %d; h: %d; m: %d; s: %d;", years, days, hours, minutes, seconds);
     }
 
-    //Utility constrain function
+    //Constrain number between maximum and minimum value
     public static double constrain(double low, double high, double value) {
         return Math.max(Math.min(value, high), low);
     }
 
-    //Utility constrain function
+    //Constrain number between maximum and minimum value
     public static int constrain(int low, int high, int value) {
         return Math.max(Math.min(value, high), low);
     }

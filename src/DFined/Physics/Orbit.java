@@ -12,38 +12,24 @@ public class Orbit {
     private double periV;
     private double eccentricity;
     private long period;
-    private CelestialBody anchor;
-    private CelestialBody orbiter;
     private double focus;
     private double yawOffset;
     private double periapsisPhase;
     private double phase;
 
-    //Calculate all orbital parameters from immediate body state
-    public static Orbit fromPoint(CelestialBody orbiter, CelestialBody anchor) {
-        Orbit result = new Orbit(orbiter);
-        result.update(anchor);
-        // orbital energy equation: u/r - v^2/2 = u/2a
-        // therefore a = 1/2(1/r - v^2/2u)
-        return result;
-    }
-
-    //The anchor is the body that this one orbits
-    public void setAnchor(CelestialBody anchor) {
-        this.anchor = anchor;
-    }
-
-    public void update(CelestialBody anchor) {
-        this.anchor = anchor;
-        this.update();
-    }
-
     //Update orbital parameters from immediate body state
-    public void update() {
-        Vector3D rVel = orbiter.getVelocity().subtract(anchor.getVelocity()).scalarMultiply(Physics.DISTANCE_SCALE);
+    public void update(
+            Vector3D orbiterP,
+            Vector3D anchorP,
+            Vector3D orbiterV,
+            Vector3D anchorV,
+            double orbiterM,
+            double anchorM
+    ) {
+        Vector3D rVel = orbiterV.subtract(anchorV).scalarMultiply(Physics.DISTANCE_SCALE);
         double v = rVel.getNorm();
-        double orbitalParameter = Physics.BIGG * Physics.MASS_UPSCALE * (orbiter.getMass() + anchor.getMass());
-        Vector3D radius = anchor.getPosition().subtract(orbiter.getPosition()).scalarMultiply(Physics.DISTANCE_SCALE);
+        double orbitalParameter = Physics.BIGG * Physics.MASS_UPSCALE * (orbiterM + anchorM);
+        Vector3D radius = anchorP.subtract(orbiterP).scalarMultiply(Physics.DISTANCE_SCALE);
         double r = radius.getNorm();
         radius = radius.normalize();
         this.semiMajor = 1.f / (2.f * ((1.f / r) - v * v / (2 * orbitalParameter)));
@@ -96,16 +82,10 @@ public class Orbit {
         }
     }
 
-    public Orbit(CelestialBody orbiter) {
-        this.orbiter = orbiter;
-    }
-
     //For displaying orbital parameters calculated in update. Not fully working yet, therefor disabled.
     @Override
     public String toString() {
         return String.format("Orbit of %s around %s:{\n\tapoapsis: %.3f;\t\nperiapsis: %.3f;\t\n maxSpeed: %.3f;\n\t minSpeed: %.3f;\n\t period: %s;\n\t semiMajor: %.3f;\n\t semiMinor: %.3f;\n\t eccentricity: %.3f;\n\t phase: %.3f\n}",
-                orbiter.getName(),
-                anchor.getName(),
                 apoapsis,
                 periapsis,
                 periV,
@@ -148,14 +128,6 @@ public class Orbit {
 
     public long getPeriod() {
         return period;
-    }
-
-    public CelestialBody getAnchor() {
-        return anchor;
-    }
-
-    public CelestialBody getOrbiter() {
-        return orbiter;
     }
 
     public double getFocus() {

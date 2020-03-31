@@ -6,11 +6,9 @@ import DFined.Physics.SolarSystemState;
 import DFined.Util;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import processing.core.PApplet;
-import processing.core.PGraphics;
-import processing.core.PShape;
+import processing.core.*;
 
-import java.sql.SQLOutput;
+import java.util.HashMap;
 
 public class Renderer {
     private float scale = 0.1f;
@@ -20,6 +18,7 @@ public class Renderer {
     private boolean isDragging = false;
     private Vector2D lastMouse = new Vector2D(0, 0);
     private PApplet applet;
+    private HashMap<String, PImage> textureBank;
     CelestialBody focus;
 
     //Focus is the celestial body on which the camera is centered
@@ -33,7 +32,29 @@ public class Renderer {
         this.applet = applet;
         mouseSphere = applet.createShape(applet.SPHERE, 10);
         mouseSphere.setStroke(255);
+        this.textureBank = new HashMap<>();
     }
+
+    //Load texture with caching
+    private PImage getOrLoadTexture(String texture) {
+        if (!textureBank.containsKey(texture)) {
+            textureBank.put(texture, this.applet.loadImage(texture));
+        }
+        return textureBank.get(texture);
+    }
+
+    //Initialize required PGraphics elements for rendering.
+    public void initGraphics(CelestialBody body) {
+        PShape shape = applet.createShape(applet.SPHERE, (float) (body.getRadius() / Physics.DISTANCE_SCALE));
+        shape.setStroke(false);
+        shape.setTexture(getOrLoadTexture(body.getTexture()));
+        PShape marker = applet.createShape(applet.SPHERE, 20);
+        marker.setStroke(false);
+        marker.setTexture(getOrLoadTexture(body.getTexture()));
+        body.setShape(shape);
+        body.setMarker(marker);
+    }
+
 
     public float getScale() {
         return scale;
@@ -49,14 +70,6 @@ public class Renderer {
     public void render(PGraphics graphics, SolarSystemState system, float mouseX, float mouseY) {
         graphics.textSize(50);
         graphics.background(0);
-
-        //graphics.text(applet.frameRate, 20, 50);
-        //graphics.text(scale, 20, 100);
-
-        //graphics.text(Physics.getTimeSpeed(), 20, 200);
-        if (!focus.isCentral()) {
-            //graphics.text(focus.getOrbit().toString(), 20, 250);
-        }
 
         graphics.perspective((float) (PI / 3.0), (float) graphics.width / graphics.height, 1, 1000000000);
         graphics.fill(255);
@@ -80,17 +93,37 @@ public class Renderer {
         //Render the planets
         for (CelestialBody state : system) {
             graphics.pushMatrix();
-            {
-                graphics.translate((float) (state.getX() - focus.getPosition().getX()), (float) (state.getY() - focus.getPosition().getY()), (float) (state.getZ() - focus.getPosition().getZ()));
-                state.draw(this, graphics);
+            graphics.translate(
+                    (float) (state.getX() - focus.getPosition().getX()),
+                    (float) (state.getY() - focus.getPosition().getY()),
+                    (float) (state.getZ() - focus.getPosition().getZ())
+            );
+
+            if (state.getShape() == null) {
+                initGraphics(state);
             }
+
+            draw(state, graphics);
             graphics.popMatrix();
         }
     }
 
+    //Self-render method. Draws the body. All necessary transforms are handled by the renderer.
+    public void draw(CelestialBody body, PGraphics graphics) {
+        graphics.pushMatrix();
+        graphics.shape(body.getShape());
+        graphics.scale(1.f / getScale());
+        graphics.shape(body.getMarker());
+        if (SimulationParameters.isDrawLabels()) {
+            graphics.rotateX(PConstants.PI / 2);
+            graphics.text(body.getName(), -body.getName().length() * 15, -80, 0);
+        }
+        graphics.popMatrix();
+    }
+
     public void setFocus(CelestialBody focus) {
         this.focus = focus;
-        Model.getGui().updateInfo(focus);
+        Model.getGui().updateInfo(focus, true);
     }
 
     //Mouse drag handler for pitch/yaw changes. Called externally from gui.ViewHandler
@@ -125,4 +158,6 @@ public class Renderer {
     public float getYaw() {
         return yaw;
     }
+
+
 }

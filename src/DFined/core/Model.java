@@ -1,3 +1,4 @@
+
 package DFined.core;
 
 import DFined.Physics.BodyParameters;
@@ -23,10 +24,12 @@ public class Model extends PApplet {
     private static SolarSystemState system;
     private static long lastTick = 0;
     private static GUI gui;
+    private static Model instance;
 
     public Model() {
         super();
         system = new SolarSystemState();
+        instance = this;
     }
 
     //PApplet method required for some pre-start settings
@@ -59,6 +62,15 @@ public class Model extends PApplet {
 
         stroke(255);
 
+        setupDefaultPlanets();
+
+        gui = new GUI(this);
+
+        renderer.setFocus(system.get(0));
+
+    }
+
+    public void setupDefaultPlanets(){
         system.addBody(BodyParameters.SUN, 0, 0, true, this);
 
         system.addBody(BodyParameters.MERCURY, 69816900000L, 38860f, false, this);
@@ -98,11 +110,6 @@ public class Model extends PApplet {
         system.addBody(BodyParameters.NEPTUNE, -4545670000000L, -5370f, false, this);
 
         system.addBody(BodyParameters.PLUTO, -7375930000000L, -3710f, false, this);
-
-        gui = new GUI(this);
-
-        renderer.setFocus(system.get(0));
-
     }
 
     public static Renderer getRenderer() {
@@ -138,5 +145,9 @@ public class Model extends PApplet {
 
     public static GUI getGui() {
         return gui;
+    }
+
+    public static Model getInstance() {
+        return instance;
     }
 }

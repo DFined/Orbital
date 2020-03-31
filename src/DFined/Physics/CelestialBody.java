@@ -1,12 +1,7 @@
 package DFined.Physics;
 
-import DFined.core.Parameters;
-import DFined.core.Renderer;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import processing.core.*;
-import processing.opengl.PGraphics3D;
-
-import java.util.List;
+import processing.core.PShape;
 
 public class CelestialBody {
     private double mass; //*10^18 kg
@@ -16,14 +11,13 @@ public class CelestialBody {
     private String name;
     private String registryName;
     private String texture;
-    private PImage textureImage;
-    private Orbit orbit = new Orbit(this);
-    private PApplet applet;
+    private Orbit orbit = new Orbit();
     private boolean central;
     private Vector3D position;
     private Vector3D velocity;
     private Vector3D acceleration = new Vector3D(0, 0, 0);
     private double maximumA = 0;
+    CelestialBody anchor;
 
     public CelestialBody(BodyParameters params) {
         this.mass = params.getMass();
@@ -40,36 +34,8 @@ public class CelestialBody {
     //Method for updating orbital parameters each tick.
     public void update() {
         if (!this.isCentral()) {
-            this.orbit.update();
+            this.orbit.update(this.position, anchor.position, this.velocity, anchor.velocity, this.mass, anchor.mass);
         }
-    }
-
-    //Self-render method. Draws the body. All necessary transforms are handled by the renderer.
-    public void draw(Renderer renderer, PGraphics graphics) {
-        graphics.pushMatrix();
-        graphics.shape(shape);
-        graphics.scale(1.f / renderer.getScale());
-        graphics.shape(marker);
-        if(Parameters.isDrawLabels()) {
-            graphics.rotateX(PConstants.PI / 2);
-            graphics.text(name, -name.length() * 15, -80, 0);
-        }
-        graphics.popMatrix();
-    }
-
-    //Initialize required PGraphics elements for rendering.
-    public CelestialBody initGraphics(PApplet pApplet) {
-        shape = pApplet.createShape(pApplet.SPHERE, (float) (radius / Physics.DISTANCE_SCALE));
-        shape.setStroke(false);
-        if (textureImage == null) {
-            textureImage = pApplet.loadImage(texture);
-        }
-        shape.setTexture(textureImage);
-        marker = pApplet.createShape(pApplet.SPHERE, 20);
-        marker.setStroke(false);
-        marker.setTexture(textureImage);
-        this.applet = pApplet;
-        return this;
     }
 
     public String getName() {
@@ -85,9 +51,9 @@ public class CelestialBody {
     }
 
     //Create a parameter-wise copy of this body. Used by the copy button in gui.
-    public CelestialBody clone(Vector3D pos, PApplet applet) {
-        CelestialBody clone = new CelestialBody(BodyParameters.getPreset(this.registryName)).initGraphics(applet);
-        int rand = (int) applet.random(0, 10000);
+    public CelestialBody clone(Vector3D pos) {
+        CelestialBody clone = new CelestialBody(BodyParameters.getPreset(this.registryName));
+        int rand = (int) (Math.random() * 10000);
         clone.setName("Planet " + rand);
         clone.setRegistryName("planet_" + rand);
         return clone.setKinetics(this.isCentral(), pos, this.getVelocity(), Vector3D.ZERO);
@@ -107,10 +73,6 @@ public class CelestialBody {
 
     protected void setRadius(double radius) {
         this.radius = radius;
-    }
-
-    public PApplet getApplet() {
-        return applet;
     }
 
     //Set body kinetics from apoapsis and velocity at apoapsis. Central argument only for orbit calculation
@@ -139,9 +101,9 @@ public class CelestialBody {
     //Add acceleration to this body. Also calculate influence factor from source for orbit calculations.
     public void addAcceleration(Vector3D accel, CelestialBody source, double dist) {
 
-        if (accel.getNorm() / dist > maximumA && !isCentral()) {
-            maximumA = accel.getNorm() / dist;
-            getOrbit().setAnchor(source);
+        if (accel.getNorm() > maximumA && !isCentral()) {
+            maximumA = accel.getNorm();
+            anchor = source;
         }
 
         this.acceleration = this.acceleration.add(accel);
@@ -183,30 +145,73 @@ public class CelestialBody {
     }
 
     //Main method for calculating gravitational attraction
-    public void calculateInfluence(SolarSystemState bodyStates, List<CelestialBody> others) {
-        for (CelestialBody other : others) {
-            Vector3D radius = position.subtract(other.position);
-            double collDist = other.getRadius() / Physics.DISTANCE_SCALE + this.getRadius() / Physics.DISTANCE_SCALE;
-            if (radius.getNorm() <= collDist) {
-                bodyStates.collide(this, other);
-            }
-            double semiForce = Physics.BIGG / (radius.getNormSq() * Physics.DISTANCE_SCALE);
-            double acc = this.getMass() * Physics.MASS_UPSCALE * semiForce / (Physics.DISTANCE_SCALE * Physics.DISTANCE_SCALE);
-            Vector3D accel = radius.scalarMultiply(acc / radius.getNorm());
-            influenceOther(accel, other, radius.getNorm());
+    public CelestialBody calculateInfluence(CelestialBody other) {
+        Vector3D radius = position.subtract(other.position);
+        double collDist = other.getRadius() / Physics.DISTANCE_SCALE + this.getRadius() / Physics.DISTANCE_SCALE;
+        double semiForce = Physics.BIGG / (radius.getNormSq() * Physics.DISTANCE_SCALE);
+        double acc = this.getMass() * Physics.MASS_UPSCALE * semiForce / (Physics.DISTANCE_SCALE * Physics.DISTANCE_SCALE);
+        Vector3D accel = radius.scalarMultiply(acc / radius.getNorm());
+        influenceOther(accel, other, radius.getNorm());
 
-            acc = other.getMass() * Physics.MASS_UPSCALE * semiForce / (Physics.DISTANCE_SCALE * Physics.DISTANCE_SCALE);
-            accel = radius.scalarMultiply(-acc / radius.getNorm());
-            addAcceleration(accel, other, radius.getNorm());
+        acc = other.getMass() * Physics.MASS_UPSCALE * semiForce / (Physics.DISTANCE_SCALE * Physics.DISTANCE_SCALE);
+        accel = radius.scalarMultiply(-acc / radius.getNorm());
+        addAcceleration(accel, other, radius.getNorm());
+        if (radius.getNorm() <= collDist) {
+            return this.collide(this, other);
         }
+        return null;
     }
+
+    /*Handle collisions between bodies. Cant add or remove bodies here, because of concurrent modifiation,
+  so they are queued*/
+    public CelestialBody collide(CelestialBody CelestialBody, CelestialBody other) {
+        CelestialBody larger = CelestialBody;
+        CelestialBody smaller = other;
+        if (other.getMass() > larger.getMass()) {
+            larger = other;
+            smaller = CelestialBody;
+        }
+        larger.setMass(larger.getMass() + smaller.getMass());
+        larger.setRadius(
+                Math.cbrt(Math.pow(larger.getRadius(), 3) + Math.pow(smaller.getRadius(), 3))
+        );
+        larger.setVelocity(
+                larger.getVelocity()
+                        .scalarMultiply(larger.getMass() / 2)
+                        .add(smaller.getMass() / 2, smaller.getVelocity())
+                        .scalarMultiply(1 / (larger.getMass() + smaller.getMass()))
+        );
+        return smaller;
+    }
+
 
     //Exert gravitational influence over other body. Could be overridden for smaller bodies to negate influence.
     public void influenceOther(Vector3D accel, CelestialBody other, double rad) {
         other.addAcceleration(accel, this, rad);
     }
 
-    protected void setVelocity(Vector3D velocity) {
+    public void setVelocity(Vector3D velocity) {
         this.velocity = velocity;
     }
+
+    public PShape getShape() {
+        return shape;
+    }
+
+    public void setShape(PShape shape) {
+        this.shape = shape;
+    }
+
+    public String getTexture() {
+        return texture;
+    }
+
+    public void setMarker(PShape marker) {
+        this.marker = marker;
+    }
+
+    public PShape getMarker() {
+        return marker;
+    }
+
 }
